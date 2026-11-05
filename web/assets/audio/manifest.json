@@ -1,0 +1,745 @@
+{
+ "sfx_key_tap": {
+  "path": "assets/audio/sfx/sfx_key_tap.mp3",
+  "kind": "sfx",
+  "duration": 0.13,
+  "loop": false,
+  "volume": 0.6
+ },
+ "sfx_charge_hum": {
+  "path": "assets/audio/sfx/sfx_charge_hum.mp3",
+  "kind": "sfx",
+  "duration": 2.3,
+  "loop": true,
+  "volume": 0.4
+ },
+ "sfx_backspace": {
+  "path": "assets/audio/sfx/sfx_backspace.mp3",
+  "kind": "sfx",
+  "duration": 0.18,
+  "loop": false,
+  "volume": 0.6
+ },
+ "sfx_swipe_whoosh": {
+  "path": "assets/audio/sfx/sfx_swipe_whoosh.mp3",
+  "kind": "sfx",
+  "duration": 0.34,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_swipe_empty": {
+  "path": "assets/audio/sfx/sfx_swipe_empty.mp3",
+  "kind": "sfx",
+  "duration": 0.29,
+  "loop": false,
+  "volume": 0.6
+ },
+ "sfx_slice_correct": {
+  "path": "assets/audio/sfx/sfx_slice_correct.mp3",
+  "kind": "sfx",
+  "duration": 0.34,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_pop_confetti": {
+  "path": "assets/audio/sfx/sfx_pop_confetti.mp3",
+  "kind": "sfx",
+  "duration": 0.52,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_coin_tinkle": {
+  "path": "assets/audio/sfx/sfx_coin_tinkle.mp3",
+  "kind": "sfx",
+  "duration": 0.44,
+  "loop": false,
+  "volume": 0.7
+ },
+ "sfx_combo_up_1": {
+  "path": "assets/audio/sfx/sfx_combo_up_1.mp3",
+  "kind": "sfx",
+  "duration": 0.34,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_combo_up_2": {
+  "path": "assets/audio/sfx/sfx_combo_up_2.mp3",
+  "kind": "sfx",
+  "duration": 0.44,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_combo_up_3": {
+  "path": "assets/audio/sfx/sfx_combo_up_3.mp3",
+  "kind": "sfx",
+  "duration": 0.52,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_combo_up_4": {
+  "path": "assets/audio/sfx/sfx_combo_up_4.mp3",
+  "kind": "sfx",
+  "duration": 0.63,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_combo_mega": {
+  "path": "assets/audio/sfx/sfx_combo_mega.mp3",
+  "kind": "sfx",
+  "duration": 1.04,
+  "loop": false,
+  "volume": 0.9
+ },
+ "sfx_combo_break": {
+  "path": "assets/audio/sfx/sfx_combo_break.mp3",
+  "kind": "sfx",
+  "duration": 0.44,
+  "loop": false,
+  "volume": 0.7
+ },
+ "sfx_blade_shatter": {
+  "path": "assets/audio/sfx/sfx_blade_shatter.mp3",
+  "kind": "sfx",
+  "duration": 0.84,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_wrong_reveal": {
+  "path": "assets/audio/sfx/sfx_wrong_reveal.mp3",
+  "kind": "sfx",
+  "duration": 0.63,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_blade_reforge": {
+  "path": "assets/audio/sfx/sfx_blade_reforge.mp3",
+  "kind": "sfx",
+  "duration": 1.04,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_fixit": {
+  "path": "assets/audio/sfx/sfx_fixit.mp3",
+  "kind": "sfx",
+  "duration": 0.63,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_escape": {
+  "path": "assets/audio/sfx/sfx_escape.mp3",
+  "kind": "sfx",
+  "duration": 0.52,
+  "loop": false,
+  "volume": 0.7
+ },
+ "sfx_monster_launch_1": {
+  "path": "assets/audio/sfx/sfx_monster_launch_1.mp3",
+  "kind": "sfx",
+  "duration": 0.34,
+  "loop": false,
+  "volume": 0.7
+ },
+ "sfx_monster_launch_2": {
+  "path": "assets/audio/sfx/sfx_monster_launch_2.mp3",
+  "kind": "sfx",
+  "duration": 0.34,
+  "loop": false,
+  "volume": 0.7
+ },
+ "sfx_monster_launch_3": {
+  "path": "assets/audio/sfx/sfx_monster_launch_3.mp3",
+  "kind": "sfx",
+  "duration": 0.34,
+  "loop": false,
+  "volume": 0.7
+ },
+ "sfx_monster_giggle_1": {
+  "path": "assets/audio/sfx/sfx_monster_giggle_1.mp3",
+  "kind": "sfx",
+  "duration": 0.52,
+  "loop": false,
+  "volume": 0.7
+ },
+ "sfx_monster_giggle_2": {
+  "path": "assets/audio/sfx/sfx_monster_giggle_2.mp3",
+  "kind": "sfx",
+  "duration": 0.52,
+  "loop": false,
+  "volume": 0.7
+ },
+ "sfx_monster_giggle_3": {
+  "path": "assets/audio/sfx/sfx_monster_giggle_3.mp3",
+  "kind": "sfx",
+  "duration": 0.52,
+  "loop": false,
+  "volume": 0.7
+ },
+ "sfx_golden_appear": {
+  "path": "assets/audio/sfx/sfx_golden_appear.mp3",
+  "kind": "sfx",
+  "duration": 0.63,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_golden_pop": {
+  "path": "assets/audio/sfx/sfx_golden_pop.mp3",
+  "kind": "sfx",
+  "duration": 0.84,
+  "loop": false,
+  "volume": 0.9
+ },
+ "sfx_armor_crack": {
+  "path": "assets/audio/sfx/sfx_armor_crack.mp3",
+  "kind": "sfx",
+  "duration": 0.44,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_split": {
+  "path": "assets/audio/sfx/sfx_split.mp3",
+  "kind": "sfx",
+  "duration": 0.44,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_freeze": {
+  "path": "assets/audio/sfx/sfx_freeze.mp3",
+  "kind": "sfx",
+  "duration": 0.84,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_unfreeze": {
+  "path": "assets/audio/sfx/sfx_unfreeze.mp3",
+  "kind": "sfx",
+  "duration": 0.52,
+  "loop": false,
+  "volume": 0.7
+ },
+ "sfx_boss_enter": {
+  "path": "assets/audio/sfx/sfx_boss_enter.mp3",
+  "kind": "sfx",
+  "duration": 1.52,
+  "loop": false,
+  "volume": 0.9
+ },
+ "sfx_boss_hit": {
+  "path": "assets/audio/sfx/sfx_boss_hit.mp3",
+  "kind": "sfx",
+  "duration": 0.34,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_boss_defeat": {
+  "path": "assets/audio/sfx/sfx_boss_defeat.mp3",
+  "kind": "sfx",
+  "duration": 2.04,
+  "loop": false,
+  "volume": 0.9
+ },
+ "sfx_xp_ding": {
+  "path": "assets/audio/sfx/sfx_xp_ding.mp3",
+  "kind": "sfx",
+  "duration": 0.34,
+  "loop": false,
+  "volume": 0.7
+ },
+ "sfx_xp_fill": {
+  "path": "assets/audio/sfx/sfx_xp_fill.mp3",
+  "kind": "sfx",
+  "duration": 1.91,
+  "loop": true,
+  "volume": 0.6
+ },
+ "sfx_count_tick": {
+  "path": "assets/audio/sfx/sfx_count_tick.mp3",
+  "kind": "sfx",
+  "duration": 0.08,
+  "loop": false,
+  "volume": 0.4
+ },
+ "sfx_level_up": {
+  "path": "assets/audio/sfx/sfx_level_up.mp3",
+  "kind": "sfx",
+  "duration": 2.04,
+  "loop": false,
+  "volume": 0.9
+ },
+ "sfx_star_1": {
+  "path": "assets/audio/sfx/sfx_star_1.mp3",
+  "kind": "sfx",
+  "duration": 0.52,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_star_2": {
+  "path": "assets/audio/sfx/sfx_star_2.mp3",
+  "kind": "sfx",
+  "duration": 0.52,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_star_3": {
+  "path": "assets/audio/sfx/sfx_star_3.mp3",
+  "kind": "sfx",
+  "duration": 0.52,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_star_sparkle": {
+  "path": "assets/audio/sfx/sfx_star_sparkle.mp3",
+  "kind": "sfx",
+  "duration": 0.84,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_chest_shake": {
+  "path": "assets/audio/sfx/sfx_chest_shake.mp3",
+  "kind": "sfx",
+  "duration": 0.63,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_chest_open": {
+  "path": "assets/audio/sfx/sfx_chest_open.mp3",
+  "kind": "sfx",
+  "duration": 1.04,
+  "loop": false,
+  "volume": 0.9
+ },
+ "sfx_item_reveal": {
+  "path": "assets/audio/sfx/sfx_item_reveal.mp3",
+  "kind": "sfx",
+  "duration": 0.63,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_unlock": {
+  "path": "assets/audio/sfx/sfx_unlock.mp3",
+  "kind": "sfx",
+  "duration": 1.52,
+  "loop": false,
+  "volume": 0.9
+ },
+ "sfx_lantern_light": {
+  "path": "assets/audio/sfx/sfx_lantern_light.mp3",
+  "kind": "sfx",
+  "duration": 0.34,
+  "loop": false,
+  "volume": 0.7
+ },
+ "sfx_crown": {
+  "path": "assets/audio/sfx/sfx_crown.mp3",
+  "kind": "sfx",
+  "duration": 1.23,
+  "loop": false,
+  "volume": 0.9
+ },
+ "sfx_badge": {
+  "path": "assets/audio/sfx/sfx_badge.mp3",
+  "kind": "sfx",
+  "duration": 0.84,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_sticker_peel": {
+  "path": "assets/audio/sfx/sfx_sticker_peel.mp3",
+  "kind": "sfx",
+  "duration": 0.52,
+  "loop": false,
+  "volume": 0.7
+ },
+ "sfx_dex_new": {
+  "path": "assets/audio/sfx/sfx_dex_new.mp3",
+  "kind": "sfx",
+  "duration": 0.84,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_shiny": {
+  "path": "assets/audio/sfx/sfx_shiny.mp3",
+  "kind": "sfx",
+  "duration": 1.04,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_purchase": {
+  "path": "assets/audio/sfx/sfx_purchase.mp3",
+  "kind": "sfx",
+  "duration": 0.63,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_ui_tap": {
+  "path": "assets/audio/sfx/sfx_ui_tap.mp3",
+  "kind": "sfx",
+  "duration": 0.13,
+  "loop": false,
+  "volume": 0.5
+ },
+ "sfx_ui_back": {
+  "path": "assets/audio/sfx/sfx_ui_back.mp3",
+  "kind": "sfx",
+  "duration": 0.18,
+  "loop": false,
+  "volume": 0.5
+ },
+ "sfx_ui_toggle": {
+  "path": "assets/audio/sfx/sfx_ui_toggle.mp3",
+  "kind": "sfx",
+  "duration": 0.18,
+  "loop": false,
+  "volume": 0.5
+ },
+ "sfx_round_start": {
+  "path": "assets/audio/sfx/sfx_round_start.mp3",
+  "kind": "sfx",
+  "duration": 1.23,
+  "loop": false,
+  "volume": 0.8
+ },
+ "sfx_round_end": {
+  "path": "assets/audio/sfx/sfx_round_end.mp3",
+  "kind": "sfx",
+  "duration": 0.84,
+  "loop": false,
+  "volume": 0.7
+ },
+ "mus_menu": {
+  "path": "assets/audio/music/mus_menu.mp3",
+  "kind": "music",
+  "duration": 60.08,
+  "loop": true,
+  "volume": 0.4
+ },
+ "mus_play_calm": {
+  "path": "assets/audio/music/mus_play_calm.mp3",
+  "kind": "music",
+  "duration": 60.08,
+  "loop": true,
+  "volume": 0.4
+ },
+ "mus_play_upbeat": {
+  "path": "assets/audio/music/mus_play_upbeat.mp3",
+  "kind": "music",
+  "duration": 60.08,
+  "loop": true,
+  "volume": 0.4
+ },
+ "mus_boss": {
+  "path": "assets/audio/music/mus_boss.mp3",
+  "kind": "music",
+  "duration": 60.03,
+  "loop": true,
+  "volume": 0.4
+ },
+ "mus_reward": {
+  "path": "assets/audio/music/mus_reward.mp3",
+  "kind": "music",
+  "duration": 30.04,
+  "loop": true,
+  "volume": 0.4
+ },
+ "mus_map": {
+  "path": "assets/audio/music/mus_map.mp3",
+  "kind": "music",
+  "duration": 60.08,
+  "loop": true,
+  "volume": 0.4
+ },
+ "mus_event": {
+  "path": "assets/audio/music/mus_event.mp3",
+  "kind": "music",
+  "duration": 60.08,
+  "loop": true,
+  "volume": 0.4
+ },
+ "vo_awesome": {
+  "path": "assets/audio/voice/vo_awesome.mp3",
+  "kind": "voice",
+  "duration": 0.84,
+  "loop": false,
+  "volume": 1,
+  "text": "Awesome!"
+ },
+ "vo_great": {
+  "path": "assets/audio/voice/vo_great.mp3",
+  "kind": "voice",
+  "duration": 0.68,
+  "loop": false,
+  "volume": 1,
+  "text": "Great!"
+ },
+ "vo_you_got_it": {
+  "path": "assets/audio/voice/vo_you_got_it.mp3",
+  "kind": "voice",
+  "duration": 0.91,
+  "loop": false,
+  "volume": 1,
+  "text": "You got it!"
+ },
+ "vo_wow": {
+  "path": "assets/audio/voice/vo_wow.mp3",
+  "kind": "voice",
+  "duration": 0.68,
+  "loop": false,
+  "volume": 1,
+  "text": "Wow!"
+ },
+ "vo_brilliant": {
+  "path": "assets/audio/voice/vo_brilliant.mp3",
+  "kind": "voice",
+  "duration": 0.84,
+  "loop": false,
+  "volume": 1,
+  "text": "Brilliant!"
+ },
+ "vo_hot": {
+  "path": "assets/audio/voice/vo_hot.mp3",
+  "kind": "voice",
+  "duration": 1.1,
+  "loop": false,
+  "volume": 1,
+  "text": "Hot streak!"
+ },
+ "vo_blazing": {
+  "path": "assets/audio/voice/vo_blazing.mp3",
+  "kind": "voice",
+  "duration": 0.91,
+  "loop": false,
+  "volume": 1,
+  "text": "Blazing!"
+ },
+ "vo_super": {
+  "path": "assets/audio/voice/vo_super.mp3",
+  "kind": "voice",
+  "duration": 1.15,
+  "loop": false,
+  "volume": 1,
+  "text": "Super combo!"
+ },
+ "vo_mega": {
+  "path": "assets/audio/voice/vo_mega.mp3",
+  "kind": "voice",
+  "duration": 1.15,
+  "loop": false,
+  "volume": 1,
+  "text": "Mega combo!"
+ },
+ "vo_fixed_it": {
+  "path": "assets/audio/voice/vo_fixed_it.mp3",
+  "kind": "voice",
+  "duration": 1.07,
+  "loop": false,
+  "volume": 1,
+  "text": "You fixed it!"
+ },
+ "vo_great_job": {
+  "path": "assets/audio/voice/vo_great_job.mp3",
+  "kind": "voice",
+  "duration": 1.07,
+  "loop": false,
+  "volume": 1,
+  "text": "Great job!"
+ },
+ "vo_three_stars": {
+  "path": "assets/audio/voice/vo_three_stars.mp3",
+  "kind": "voice",
+  "duration": 1.99,
+  "loop": false,
+  "volume": 1,
+  "text": "Three stars! Amazing!"
+ },
+ "vo_rainbow": {
+  "path": "assets/audio/voice/vo_rainbow.mp3",
+  "kind": "voice",
+  "duration": 1.15,
+  "loop": false,
+  "volume": 1,
+  "text": "Rainbow star!"
+ },
+ "vo_level_up": {
+  "path": "assets/audio/voice/vo_level_up.mp3",
+  "kind": "voice",
+  "duration": 0.97,
+  "loop": false,
+  "volume": 1,
+  "text": "Level up!"
+ },
+ "vo_new_monster": {
+  "path": "assets/audio/voice/vo_new_monster.mp3",
+  "kind": "voice",
+  "duration": 1.44,
+  "loop": false,
+  "volume": 1,
+  "text": "A new monster friend!"
+ },
+ "vo_new_badge": {
+  "path": "assets/audio/voice/vo_new_badge.mp3",
+  "kind": "voice",
+  "duration": 0.91,
+  "loop": false,
+  "volume": 1,
+  "text": "New badge!"
+ },
+ "vo_treasure": {
+  "path": "assets/audio/voice/vo_treasure.mp3",
+  "kind": "voice",
+  "duration": 0.91,
+  "loop": false,
+  "volume": 1,
+  "text": "Treasure!"
+ },
+ "vo_new_best": {
+  "path": "assets/audio/voice/vo_new_best.mp3",
+  "kind": "voice",
+  "duration": 1.25,
+  "loop": false,
+  "volume": 1,
+  "text": "New best score!"
+ },
+ "vo_boss_time": {
+  "path": "assets/audio/voice/vo_boss_time.mp3",
+  "kind": "voice",
+  "duration": 1.38,
+  "loop": false,
+  "volume": 1,
+  "text": "Here comes a big one!"
+ },
+ "vo_boss_defeated": {
+  "path": "assets/audio/voice/vo_boss_defeated.mp3",
+  "kind": "voice",
+  "duration": 1.7,
+  "loop": false,
+  "volume": 1,
+  "text": "You did it! Boss tickled!"
+ },
+ "vo_new_island": {
+  "path": "assets/audio/voice/vo_new_island.mp3",
+  "kind": "voice",
+  "duration": 1.15,
+  "loop": false,
+  "volume": 1,
+  "text": "A new island!"
+ },
+ "vo_crown": {
+  "path": "assets/audio/voice/vo_crown.mp3",
+  "kind": "voice",
+  "duration": 1.67,
+  "loop": false,
+  "volume": 1,
+  "text": "You earned a golden crown!"
+ },
+ "vo_golden": {
+  "path": "assets/audio/voice/vo_golden.mp3",
+  "kind": "voice",
+  "duration": 1.25,
+  "loop": false,
+  "volume": 1,
+  "text": "Golden monster!"
+ },
+ "vo_ready_go": {
+  "path": "assets/audio/voice/vo_ready_go.mp3",
+  "kind": "voice",
+  "duration": 1.28,
+  "loop": false,
+  "volume": 1,
+  "text": "Ready? Go!"
+ },
+ "vo_lets_play": {
+  "path": "assets/audio/voice/vo_lets_play.mp3",
+  "kind": "voice",
+  "duration": 1.02,
+  "loop": false,
+  "volume": 1,
+  "text": "Let's play!"
+ },
+ "vo_whos_playing": {
+  "path": "assets/audio/voice/vo_whos_playing.mp3",
+  "kind": "voice",
+  "duration": 1.02,
+  "loop": false,
+  "volume": 1,
+  "text": "Who's playing?"
+ },
+ "vo_pick_avatar": {
+  "path": "assets/audio/voice/vo_pick_avatar.mp3",
+  "kind": "voice",
+  "duration": 1.44,
+  "loop": false,
+  "volume": 1,
+  "text": "Pick your monster buddy!"
+ },
+ "vo_how_old": {
+  "path": "assets/audio/voice/vo_how_old.mp3",
+  "kind": "voice",
+  "duration": 1.15,
+  "loop": false,
+  "volume": 1,
+  "text": "How old are you?"
+ },
+ "vo_welcome_back": {
+  "path": "assets/audio/voice/vo_welcome_back.mp3",
+  "kind": "voice",
+  "duration": 0.91,
+  "loop": false,
+  "volume": 1,
+  "text": "Welcome back!"
+ },
+ "vo_workshop": {
+  "path": "assets/audio/voice/vo_workshop.mp3",
+  "kind": "voice",
+  "duration": 1.44,
+  "loop": false,
+  "volume": 1,
+  "text": "The workshop is open!"
+ },
+ "vo_monster_book": {
+  "path": "assets/audio/voice/vo_monster_book.mp3",
+  "kind": "voice",
+  "duration": 1.33,
+  "loop": false,
+  "volume": 1,
+  "text": "Your monster book!"
+ },
+ "vo_sticker_book": {
+  "path": "assets/audio/voice/vo_sticker_book.mp3",
+  "kind": "voice",
+  "duration": 1.33,
+  "loop": false,
+  "volume": 1,
+  "text": "Your sticker album!"
+ },
+ "vo_locker": {
+  "path": "assets/audio/voice/vo_locker.mp3",
+  "kind": "voice",
+  "duration": 1.07,
+  "loop": false,
+  "volume": 1,
+  "text": "Dress up time!"
+ },
+ "vo_show_know": {
+  "path": "assets/audio/voice/vo_show_know.mp3",
+  "kind": "voice",
+  "duration": 1.15,
+  "loop": false,
+  "volume": 1,
+  "text": "Show what you know!"
+ },
+ "vo_grownups": {
+  "path": "assets/audio/voice/vo_grownups.mp3",
+  "kind": "voice",
+  "duration": 1.52,
+  "loop": false,
+  "volume": 1,
+  "text": "Grown-ups only, please!"
+ },
+ "vo_type_then_swipe": {
+  "path": "assets/audio/voice/vo_type_then_swipe.mp3",
+  "kind": "voice",
+  "duration": 1.85,
+  "loop": false,
+  "volume": 1,
+  "text": "Type the answer, then swipe!"
+ }
+}

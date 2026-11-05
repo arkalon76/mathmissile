@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; img-src 'self' data:; style-src 'self'; media-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#4fc3ff">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2255%22 r=%2242%22 fill=%22%23ffd24a%22/%3E%3Ccircle cx=%2236%22 cy=%2248%22 r=%229%22 fill=%22%23fff%22/%3E%3Ccircle cx=%2264%22 cy=%2248%22 r=%229%22 fill=%22%23fff%22/%3E%3Ccircle cx=%2238%22 cy=%2250%22 r=%224%22/%3E%3Ccircle cx=%2266%22 cy=%2250%22 r=%224%22/%3E%3C/svg%3E">
+  <title>Math Missile</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="game" aria-label="Math Missile game"></canvas>
+      <div id="hud" hidden></div>
+      <div id="screen" class="screen"></div>
+      <div id="error" role="alert" hidden></div>
+    </div>
+    <div id="pad" hidden></div>
+  </div>
+  <div id="modal" hidden></div>
+  <div id="fx" aria-hidden="true"></div>
+  <noscript>Math Missile needs JavaScript.</noscript>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

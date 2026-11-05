@@ -1,0 +1,799 @@
+{
+ "version": 1,
+ "outputFormat": "mp3_44100_128",
+ "voice": {
+  "voice_id": "cgSgspJ2msm6clMCkdW9",
+  "name": "Jessica - Playful, Bright, Warm",
+  "model_id": "eleven_multilingual_v2",
+  "settings": {
+   "stability": 0.45,
+   "similarity_boost": 0.75,
+   "style": 0.35,
+   "use_speaker_boost": true,
+   "speed": 0.95
+  }
+ },
+ "sfx": {
+  "model_id": "eleven_text_to_sound_v2",
+  "prompt_influence": 0.5,
+  "minApiSeconds": 0.5
+ },
+ "music": {
+  "model_id": "music_v1",
+  "force_instrumental": true
+ },
+ "assets": [
+  {
+   "id": "sfx_key_tap",
+   "kind": "sfx",
+   "duration": 0.1,
+   "loop": false,
+   "prompt": "Soft bubbly pop tap, like pressing a squishy toy button, cartoon. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.6
+  },
+  {
+   "id": "sfx_charge_hum",
+   "kind": "sfx",
+   "duration": 2,
+   "loop": true,
+   "prompt": "Gentle magical humming glow, warm and steady, seamless loop. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.4
+  },
+  {
+   "id": "sfx_backspace",
+   "kind": "sfx",
+   "duration": 0.15,
+   "loop": false,
+   "prompt": "Quick soft reverse pop, tiny whoop downward. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.6
+  },
+  {
+   "id": "sfx_swipe_whoosh",
+   "kind": "sfx",
+   "duration": 0.3,
+   "loop": false,
+   "prompt": "Light airy sword whoosh, cartoony and quick. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_swipe_empty",
+   "kind": "sfx",
+   "duration": 0.25,
+   "loop": false,
+   "prompt": "Very soft breathy swish with a tiny puff, harmless. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.6
+  },
+  {
+   "id": "sfx_slice_correct",
+   "kind": "sfx",
+   "duration": 0.3,
+   "loop": false,
+   "prompt": "Crisp bright magical slice with a sparkly shing. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_pop_confetti",
+   "kind": "sfx",
+   "duration": 0.5,
+   "loop": false,
+   "prompt": "Happy balloon pop bursting into confetti and tiny bells. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_coin_tinkle",
+   "kind": "sfx",
+   "duration": 0.4,
+   "loop": false,
+   "prompt": "Small cascade of tiny coins tinkling, light and cheerful. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "sfx_combo_up_1",
+   "kind": "sfx",
+   "duration": 0.3,
+   "loop": false,
+   "prompt": "Single rising chime note, cheerful. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_combo_up_2",
+   "kind": "sfx",
+   "duration": 0.4,
+   "loop": false,
+   "prompt": "Two quick rising chimes, excited. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_combo_up_3",
+   "kind": "sfx",
+   "duration": 0.5,
+   "loop": false,
+   "prompt": "Three fast rising chimes with sparkle shimmer. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_combo_up_4",
+   "kind": "sfx",
+   "duration": 0.6,
+   "loop": false,
+   "prompt": "Rising arpeggio of chimes with a whoosh, very excited. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_combo_mega",
+   "kind": "sfx",
+   "duration": 1,
+   "loop": false,
+   "prompt": "Big triumphant chime arpeggio with a firework sparkle burst. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.9
+  },
+  {
+   "id": "sfx_combo_break",
+   "kind": "sfx",
+   "duration": 0.4,
+   "loop": false,
+   "prompt": "Soft cartoon balloon deflating \"bwoop\", gentle and funny, not sad. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "sfx_blade_shatter",
+   "kind": "sfx",
+   "duration": 0.8,
+   "loop": false,
+   "prompt": "Dramatic cartoon crystal shatter, many glass shards tinkling down, big but not scary. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_wrong_reveal",
+   "kind": "sfx",
+   "duration": 0.6,
+   "loop": false,
+   "prompt": "Gentle two-note xylophone \"here it is\", warm and kind. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_blade_reforge",
+   "kind": "sfx",
+   "duration": 1,
+   "loop": false,
+   "prompt": "Magical shimmering swirl that builds to a bright ting as a crystal reforms. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_fixit",
+   "kind": "sfx",
+   "duration": 0.6,
+   "loop": false,
+   "prompt": "Cheerful bouncy \"ta-da\" on bells, proud. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_escape",
+   "kind": "sfx",
+   "duration": 0.5,
+   "loop": false,
+   "prompt": "Playful slide whistle going away, fading. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "sfx_monster_launch_1",
+   "kind": "sfx",
+   "duration": 0.3,
+   "loop": false,
+   "prompt": "springy boing launch, cute. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "sfx_monster_launch_2",
+   "kind": "sfx",
+   "duration": 0.3,
+   "loop": false,
+   "prompt": "bubbly whoop launch, cute. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "sfx_monster_launch_3",
+   "kind": "sfx",
+   "duration": 0.3,
+   "loop": false,
+   "prompt": "cork pop launch, cute. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "sfx_monster_giggle_1",
+   "kind": "sfx",
+   "duration": 0.5,
+   "loop": false,
+   "prompt": "Tiny high-pitched creature giggle, cute, non-human, no words. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "sfx_monster_giggle_2",
+   "kind": "sfx",
+   "duration": 0.5,
+   "loop": false,
+   "prompt": "Tiny high-pitched creature giggle, cute, non-human, no words. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "sfx_monster_giggle_3",
+   "kind": "sfx",
+   "duration": 0.5,
+   "loop": false,
+   "prompt": "Tiny high-pitched creature giggle, cute, non-human, no words. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "sfx_golden_appear",
+   "kind": "sfx",
+   "duration": 0.6,
+   "loop": false,
+   "prompt": "Twinkling golden sparkle shimmer, magical. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_golden_pop",
+   "kind": "sfx",
+   "duration": 0.8,
+   "loop": false,
+   "prompt": "Jackpot of bright bells and coins bursting, joyful. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.9
+  },
+  {
+   "id": "sfx_armor_crack",
+   "kind": "sfx",
+   "duration": 0.4,
+   "loop": false,
+   "prompt": "Cartoon shell cracking with a hollow clonk. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_split",
+   "kind": "sfx",
+   "duration": 0.4,
+   "loop": false,
+   "prompt": "Bubbly split, like a blob dividing in two with a boing. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_freeze",
+   "kind": "sfx",
+   "duration": 0.8,
+   "loop": false,
+   "prompt": "Icy crystal swoosh freezing, sparkly and cool. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_unfreeze",
+   "kind": "sfx",
+   "duration": 0.5,
+   "loop": false,
+   "prompt": "Gentle ice melting tinkle. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "sfx_boss_enter",
+   "kind": "sfx",
+   "duration": 1.5,
+   "loop": false,
+   "prompt": "Big friendly cartoon monster rumble and silly roar, more goofy than scary. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.9
+  },
+  {
+   "id": "sfx_boss_hit",
+   "kind": "sfx",
+   "duration": 0.3,
+   "loop": false,
+   "prompt": "Funny bonk on a big soft drum, boing. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_boss_defeat",
+   "kind": "sfx",
+   "duration": 2,
+   "loop": false,
+   "prompt": "Giant happy pop followed by fireworks and a short cheer of tiny creatures. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.9
+  },
+  {
+   "id": "sfx_xp_ding",
+   "kind": "sfx",
+   "duration": 0.3,
+   "loop": false,
+   "prompt": "Small bright level ding. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "sfx_xp_fill",
+   "kind": "sfx",
+   "duration": 1.5,
+   "loop": true,
+   "prompt": "Rising sparkly tick sequence, building anticipation, loopable. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.6
+  },
+  {
+   "id": "sfx_count_tick",
+   "kind": "sfx",
+   "duration": 0.05,
+   "loop": false,
+   "prompt": "Tiny soft tick for counting up a score. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.4
+  },
+  {
+   "id": "sfx_level_up",
+   "kind": "sfx",
+   "duration": 2,
+   "loop": false,
+   "prompt": "Short triumphant fanfare sting with brass and sparkles, celebratory, kid-friendly. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.9
+  },
+  {
+   "id": "sfx_star_1",
+   "kind": "sfx",
+   "duration": 0.5,
+   "loop": false,
+   "prompt": "Star chime, lowest pitch of three ascending pitches. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_star_2",
+   "kind": "sfx",
+   "duration": 0.5,
+   "loop": false,
+   "prompt": "Star chime, middle pitch of three ascending pitches, brighter. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_star_3",
+   "kind": "sfx",
+   "duration": 0.5,
+   "loop": false,
+   "prompt": "Star chime, highest pitch of three ascending pitches, brightest. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_star_sparkle",
+   "kind": "sfx",
+   "duration": 0.8,
+   "loop": false,
+   "prompt": "Extra-special rainbow sparkle chime, magical. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_chest_shake",
+   "kind": "sfx",
+   "duration": 0.6,
+   "loop": false,
+   "prompt": "Wooden chest rattling with excitement, little jingles inside. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_chest_open",
+   "kind": "sfx",
+   "duration": 1,
+   "loop": false,
+   "prompt": "Treasure chest bursting open with a choir \"aah\" and sparkles. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.9
+  },
+  {
+   "id": "sfx_item_reveal",
+   "kind": "sfx",
+   "duration": 0.6,
+   "loop": false,
+   "prompt": "Pop-up reveal shimmer, ta-da. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_unlock",
+   "kind": "sfx",
+   "duration": 1.5,
+   "loop": false,
+   "prompt": "Magical island rising from clouds, whoosh with harp glissando. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.9
+  },
+  {
+   "id": "sfx_lantern_light",
+   "kind": "sfx",
+   "duration": 0.3,
+   "loop": false,
+   "prompt": "Soft warm lantern lighting, gentle chime puff. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "sfx_crown",
+   "kind": "sfx",
+   "duration": 1.2,
+   "loop": false,
+   "prompt": "Royal little fanfare with a sparkling crown ding. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.9
+  },
+  {
+   "id": "sfx_badge",
+   "kind": "sfx",
+   "duration": 0.8,
+   "loop": false,
+   "prompt": "Shiny medal clink with a sparkle. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_sticker_peel",
+   "kind": "sfx",
+   "duration": 0.5,
+   "loop": false,
+   "prompt": "Sticker peel and slap onto paper, satisfying. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "sfx_dex_new",
+   "kind": "sfx",
+   "duration": 0.8,
+   "loop": false,
+   "prompt": "Book page flip followed by a happy discovery chime. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_shiny",
+   "kind": "sfx",
+   "duration": 1,
+   "loop": false,
+   "prompt": "Rare rainbow shimmer, glittering and special. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_purchase",
+   "kind": "sfx",
+   "duration": 0.6,
+   "loop": false,
+   "prompt": "Cash-register-free happy \"ka-ching\" of bells and coins (no real money feel, toy-like). Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_ui_tap",
+   "kind": "sfx",
+   "duration": 0.1,
+   "loop": false,
+   "prompt": "Soft round button click, toy-like. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.5
+  },
+  {
+   "id": "sfx_ui_back",
+   "kind": "sfx",
+   "duration": 0.15,
+   "loop": false,
+   "prompt": "Soft lower-pitched button click. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.5
+  },
+  {
+   "id": "sfx_ui_toggle",
+   "kind": "sfx",
+   "duration": 0.15,
+   "loop": false,
+   "prompt": "Little switch flick with a tiny pop. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.5
+  },
+  {
+   "id": "sfx_round_start",
+   "kind": "sfx",
+   "duration": 1.2,
+   "loop": false,
+   "prompt": "Three soft countdown chimes then a bright go chime. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.8
+  },
+  {
+   "id": "sfx_round_end",
+   "kind": "sfx",
+   "duration": 0.8,
+   "loop": false,
+   "prompt": "Friendly referee whistle, cheerful toot. Style: cartoony, soft, bright, child-friendly, no harsh high frequencies, short clean tail.",
+   "volume": 0.7
+  },
+  {
+   "id": "mus_menu",
+   "kind": "music",
+   "duration": 60,
+   "loop": true,
+   "prompt": "Cheerful whimsical menu music for a kids game, marimba, ukulele and soft bells, 100 BPM, warm and inviting, seamless loop Instrumental, no vocals.",
+   "volume": 0.4
+  },
+  {
+   "id": "mus_play_calm",
+   "kind": "music",
+   "duration": 60,
+   "loop": true,
+   "prompt": "Light bouncy gameplay music, plucked strings, kalimba and gentle percussion, 92 BPM, focused but happy, not distracting, seamless loop Instrumental, no vocals.",
+   "volume": 0.4
+  },
+  {
+   "id": "mus_play_upbeat",
+   "kind": "music",
+   "duration": 60,
+   "loop": true,
+   "prompt": "Energetic playful gameplay music, synth bass, claps, glockenspiel melody, 124 BPM, exciting but friendly, seamless loop Instrumental, no vocals.",
+   "volume": 0.4
+  },
+  {
+   "id": "mus_boss",
+   "kind": "music",
+   "duration": 60,
+   "loop": true,
+   "prompt": "Goofy big-monster boss music, tuba and timpani with playful brass stabs, 110 BPM, dramatic but silly, not scary, seamless loop Instrumental, no vocals.",
+   "volume": 0.4
+  },
+  {
+   "id": "mus_reward",
+   "kind": "music",
+   "duration": 30,
+   "loop": true,
+   "prompt": "Short celebratory loop, bright bells and strings, triumphant and warm, 16 bars Instrumental, no vocals.",
+   "volume": 0.4
+  },
+  {
+   "id": "mus_map",
+   "kind": "music",
+   "duration": 60,
+   "loop": true,
+   "prompt": "Dreamy adventure map music, flute, harp and soft pads, sense of wonder, 85 BPM, seamless loop Instrumental, no vocals.",
+   "volume": 0.4
+  },
+  {
+   "id": "mus_event",
+   "kind": "music",
+   "duration": 60,
+   "loop": true,
+   "prompt": "Shimmering golden festival music, steel drums and chimes, 112 BPM, seamless loop Instrumental, no vocals.",
+   "volume": 0.4
+  },
+  {
+   "id": "vo_awesome",
+   "kind": "voice",
+   "text": "Awesome!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_great",
+   "kind": "voice",
+   "text": "Great!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_you_got_it",
+   "kind": "voice",
+   "text": "You got it!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_wow",
+   "kind": "voice",
+   "text": "Wow!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_brilliant",
+   "kind": "voice",
+   "text": "Brilliant!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_hot",
+   "kind": "voice",
+   "text": "Hot streak!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_blazing",
+   "kind": "voice",
+   "text": "Blazing!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_super",
+   "kind": "voice",
+   "text": "Super combo!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_mega",
+   "kind": "voice",
+   "text": "Mega combo!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_fixed_it",
+   "kind": "voice",
+   "text": "You fixed it!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_great_job",
+   "kind": "voice",
+   "text": "Great job!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_three_stars",
+   "kind": "voice",
+   "text": "Three stars! Amazing!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_rainbow",
+   "kind": "voice",
+   "text": "Rainbow star!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_level_up",
+   "kind": "voice",
+   "text": "Level up!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_new_monster",
+   "kind": "voice",
+   "text": "A new monster friend!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_new_badge",
+   "kind": "voice",
+   "text": "New badge!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_treasure",
+   "kind": "voice",
+   "text": "Treasure!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_new_best",
+   "kind": "voice",
+   "text": "New best score!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_boss_time",
+   "kind": "voice",
+   "text": "Here comes a big one!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_boss_defeated",
+   "kind": "voice",
+   "text": "You did it! Boss tickled!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_new_island",
+   "kind": "voice",
+   "text": "A new island!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_crown",
+   "kind": "voice",
+   "text": "You earned a golden crown!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_golden",
+   "kind": "voice",
+   "text": "Golden monster!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_ready_go",
+   "kind": "voice",
+   "text": "Ready? Go!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_lets_play",
+   "kind": "voice",
+   "text": "Let's play!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_whos_playing",
+   "kind": "voice",
+   "text": "Who's playing?",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_pick_avatar",
+   "kind": "voice",
+   "text": "Pick your monster buddy!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_how_old",
+   "kind": "voice",
+   "text": "How old are you?",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_welcome_back",
+   "kind": "voice",
+   "text": "Welcome back!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_workshop",
+   "kind": "voice",
+   "text": "The workshop is open!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_monster_book",
+   "kind": "voice",
+   "text": "Your monster book!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_sticker_book",
+   "kind": "voice",
+   "text": "Your sticker album!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_locker",
+   "kind": "voice",
+   "text": "Dress up time!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_show_know",
+   "kind": "voice",
+   "text": "Show what you know!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_grownups",
+   "kind": "voice",
+   "text": "Grown-ups only, please!",
+   "loop": false,
+   "volume": 1
+  },
+  {
+   "id": "vo_type_then_swipe",
+   "kind": "voice",
+   "text": "Type the answer, then swipe!",
+   "loop": false,
+   "volume": 1
+  }
+ ]
+}

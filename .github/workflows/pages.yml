@@ -1,0 +1,41 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test the game logic
+        run: node --test web/tests/index.js
+      # The engine is built locally (./build.sh build) and web/pkg is committed,
+      # so CI only publishes web/, without tests and dev notes.
+      - name: Assemble site
+        run: |
+          rsync -a --exclude tests/ --exclude ENGINE_REQUESTS.md web/ _site/
+          test -f _site/pkg/mathmissile_engine_bg.wasm
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
