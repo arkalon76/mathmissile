@@ -22,6 +22,7 @@ pub const MIN_RADIUS: f32 = 118.0;
 pub const TRAIL_CAP: usize = 48;
 pub const TRAIL_LIFE: f32 = 0.18;
 const STROKE_CAP: usize = 8;
+const BOSS_LAUGH_S: f32 = 1.2;
 const GIGGLES: [&str; 3] = ["sfx_monster_giggle_1", "sfx_monster_giggle_2", "sfx_monster_giggle_3"];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -256,6 +257,22 @@ pub struct Boss {
     /// Seconds into the defeat sequence (None = still playing).
     pub defeat: Option<f32>,
     pub fireworks: u8,
+    /// 1 = calm, 2 = mad (≤ 2/3 hp), 3 = last stand (≤ 1/3 hp).
+    pub phase: u8,
+    /// Seconds left of the "hee hee" laugh after a wrong answer.
+    pub laugh: f32,
+}
+
+impl Boss {
+    pub fn phase_for(hp: u32, max_hp: u32) -> u8 {
+        if hp * 3 <= max_hp {
+            3
+        } else if hp * 3 <= max_hp * 2 {
+            2
+        } else {
+            1
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -606,6 +623,8 @@ impl Sim {
             bonk: 0.0,
             defeat: None,
             fireworks: 0,
+            phase: 1,
+            laugh: 0.0,
         });
         self.cfg = cfg;
         self.calm = self.calm_user || self.cfg.calm.unwrap_or(false);
@@ -698,7 +717,13 @@ impl Sim {
     }
 
     pub fn interval(&self) -> f32 {
-        let i = self.cfg.speed.spawn_interval.unwrap_or_else(|| tier_lerp(&TIER_INTERVAL_S, self.x()));
+        let mut i = self.cfg.speed.spawn_interval.unwrap_or_else(|| tier_lerp(&TIER_INTERVAL_S, self.x()));
+        // The boss throws minions a little faster as it gets angrier.
+        if let Some(b) = self.boss {
+            if b.phase >= 2 && b.defeat.is_none() {
+                i *= if b.phase >= 3 { 0.8 } else { 0.9 };
+            }
+        }
         if self.adaptive.gentle_left > 0 {
             i * GENTLE_INTERVAL_MUL
         } else {
@@ -1249,6 +1274,7 @@ impl Sim {
         b.enter = (b.enter + dt / BOSS_ENTER_S).min(1.0);
         b.hit_flash = (b.hit_flash - dt).max(0.0);
         b.bonk = (b.bonk - dt).max(0.0);
+        b.laugh = (b.laugh - dt).max(0.0);
         let mut fw: [Option<Vec2>; 3] = [None; 3];
         if let Some(t) = b.defeat {
             let t = t + dt;
@@ -1621,6 +1647,14 @@ impl Sim {
         self.sfx("sfx_blade_shatter");
         self.sfx("sfx_wrong_reveal");
         self.shatter_fx(contact, dir);
+        if let Some(mut b) = self.boss {
+            if b.defeat.is_none() && b.laugh <= 0.0 {
+                b.laugh = BOSS_LAUGH_S;
+                self.boss = Some(b);
+                let g = self.fx.below(3) as usize;
+                self.sfx(GIGGLES[g]);
+            }
+        }
     }
 
     fn on_escape(&mut self, m: &Monster) {
@@ -1707,6 +1741,14 @@ impl Sim {
         self.beam(from, b.pos);
         self.events.push(Event::BossHit { hp: b.hp, max_hp: b.max_hp });
         self.sfx("sfx_boss_hit");
+        let phase = Boss::phase_for(b.hp, b.max_hp);
+        if b.hp > 0 && phase > b.phase {
+            b.phase = phase;
+            b.laugh = 0.0;
+            self.boss = Some(b);
+            self.events.push(Event::BossPhase { phase });
+            self.shake(10.0, 0.35);
+        }
         if b.hp == 0 {
             b.defeat = Some(0.0);
             self.boss = Some(b);
@@ -2474,6 +2516,7 @@ mod tests {
         }
         assert_eq!(s.boss.unwrap().hp, 0);
         assert_eq!(count(&all, |e| matches!(e, Event::BossHit { .. })), 3);
+        assert_eq!(count(&all, |e| matches!(e, Event::BossPhase { .. })), 2, "mad at 2/3, last stand at 1/3");
         assert!(all.iter().any(|e| matches!(e, Event::BossDefeated { .. })));
         assert!(all.contains(&sfx("vo_boss_defeated")));
         assert!(s.deck.slots.len() >= 4, "the missed fact went to the back");

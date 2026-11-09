@@ -5,7 +5,7 @@ import { PATH, tableFacts, pathIndex } from './facts.js';
 
 export function blankTable() {
   return { state: 'locked', openedRound: null, knownRound: null, bossBeaten: false, bossPending: false,
-    masteredDay: null, roundsOpen: 0, speedWaiverCount: 0 };
+    masteredDay: null, roundsOpen: 0, speedWaiverCount: 0, bossMedal: 0, bossWins: 0 };
 }
 
 export function tableRec(profile, T) {

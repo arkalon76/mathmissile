@@ -132,6 +132,14 @@ export const TUNING = Object.freeze({
   },
   maxLevel: 99,
 
+  // §6.5 Boss: extra repeats of the shakiest facts; every win pays, medals pay a chest.
+  bossRepeats: 3,
+  // Revision rounds are a little longer than normal ones.
+  revisionExtra: 4,
+  bossWin: { xp: 50, sparks: 10 },
+  // Medal accuracy thresholds: 1 = bronze (any win), 2 = silver, 3 = gold (+ speed).
+  bossMedalAcc: [0, 0.8, 0.95],
+
   // §5.3 Monster Book.
   stampAt: { met: 1, friend: 25, best: 100 },
   stampSparks: 5,

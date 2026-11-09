@@ -62,6 +62,7 @@ pub enum Event {
     Unfreeze,
     Split { id: u32, minis: [Option<Fact>; 2] },
     BossHit { hp: u32, max_hp: u32 },
+    BossPhase { phase: u8 },
     BossDefeated { species: SpeciesRef },
     Speed { x: f32, offset: f32 },
     Sfx { name: &'static str, semitones: i8 },
@@ -216,6 +217,9 @@ impl Sim {
             }
             Event::BossHit { hp, max_hp } => {
                 let _ = write!(out, "{{\"type\":\"boss_hit\",\"hp\":{hp},\"max_hp\":{max_hp}}}");
+            }
+            Event::BossPhase { phase } => {
+                let _ = write!(out, "{{\"type\":\"boss_phase\",\"phase\":{phase}}}");
             }
             Event::BossDefeated { species: s } => {
                 out.push_str("{\"type\":\"boss_defeated\",\"species\":");

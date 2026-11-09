@@ -5,7 +5,7 @@
 import { h, btn, clear } from './dom.js';
 import { avatarArt, monsterArt } from './art.js';
 import { TUNING } from '../logic/tuning.js';
-import { PATH, TABLES, factKey, parseKey, ALL_FACT_KEYS, factState, homeTable } from '../logic/facts.js';
+import { TABLES, factKey, parseKey, ALL_FACT_KEYS, factState, homeTable } from '../logic/facts.js';
 import { tableState, isOpenState, applyManualTables } from '../logic/tables.js';
 import { TIER_NAMES } from '../logic/speed.js';
 import { cleanText, bandForAge } from '../logic/profile.js';
@@ -199,7 +199,7 @@ export function parentArea(app, { childId = null, tab = 'progress' } = {}) {
       h('h3', null, `Known (${known.length})`), h('p', { class: 'fact-list' }, known.map(label).join('  ') || '–'),
       h('h3', null, `Tricky (${tricky.length})`), h('p', { class: 'fact-list tricky-list' }, tricky.map(label).join('  ') || '–'),
       h('h3', null, 'Tables'),
-      h('div', { class: 'table-states' }, ...PATH.map((T) => h('span', { class: `ts ts-${tableState(p, T)}` }, `×${T}: ${tableState(p, T)}`))));
+      h('div', { class: 'table-states' }, ...TABLES.map((T) => h('span', { class: `ts ts-${tableState(p, T)}` }, `×${T}: ${tableState(p, T)}`))));
   }
   const stat = (k, v) => h('div', { class: 'stat' }, h('div', { class: 'stat-v' }, v), h('div', { class: 'stat-k' }, k));
 
@@ -216,7 +216,7 @@ export function parentArea(app, { childId = null, tab = 'progress' } = {}) {
       } }, n)));
     const modeRow = h('div', { class: 'seg' }, ...[['guided', 'Guided path'], ['manual', 'Pick tables']].map(([m, label]) =>
       h('button', { type: 'button', class: ['seg-btn', S.tableMode === m ? 'on' : ''], onclick: () => { S.tableMode = m; save(p); render(); } }, label)));
-    const tableBoxes = h('div', { class: 'table-picks' }, ...PATH.map((T) => {
+    const tableBoxes = h('div', { class: 'table-picks' }, ...TABLES.map((T) => {
       const open = isOpenState(tableState(p, T));
       const cb = h('input', { type: 'checkbox', checked: open || S.manualTables.includes(T), disabled: open && !S.manualTables.includes(T), value: T });
       return h('label', { class: 'table-pick' }, cb, ` ×${T}`);

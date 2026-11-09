@@ -372,8 +372,21 @@ pub fn build(sim: &Sim, g: &GlyphTable, w: &mut InstanceWriter) {
         let mut l = MonsterLook::new(b.species, pos, b.radius);
         l.t = t;
         l.age = t;
-        l.mood = mood::GRUMPY;
+        l.mood = if b.phase >= 2 { mood::DETERMINED } else { mood::GRUMPY };
         l.look = v2((t * 0.7).sin() * 0.5, -0.3);
+        if b.phase >= 2 && b.defeat.is_none() {
+            // Angrier tint, with a pulse in the last stand.
+            let k = if b.phase >= 3 { 0.35 + 0.15 * (t * 6.0).sin() } else { 0.22 };
+            let red = [1.0, 0.3, 0.3];
+            for c in 0..3 {
+                l.color[c] += (red[c] - l.color[c]) * k;
+            }
+            l.glow = if b.phase >= 3 { 0.6 } else { 0.3 };
+        }
+        if b.laugh > 0.0 {
+            l.mood = mood::HAPPY;
+            pos.y += (b.laugh * 30.0).sin() * 6.0;
+        }
         l.white = (b.hit_flash / 0.1).clamp(0.0, 1.0);
         if b.bonk > 0.0 {
             l.mood = mood::BONK;
@@ -388,21 +401,7 @@ pub fn build(sim: &Sim, g: &GlyphTable, w: &mut InstanceWriter) {
         l.pos = pos;
         l.alpha = alpha;
         push_monster(w, &l);
-        // Hearts row.
-        if b.defeat.is_none() && e > 0.5 {
-            let n = b.max_hp.min(12);
-            let s = (b.radius * 0.16).min(34.0);
-            let gap = s * 2.3;
-            let x0 = pos.x - gap * (n as f32 - 1.0) * 0.5;
-            let y = pos.y + b.radius * 1.25;
-            for k in 0..n {
-                let full_h = k < b.hp;
-                let id = if full_h { icon::HEART } else { icon::HEART_EMPTY };
-                let c = if full_h { [1.0, 0.42, 0.55, 1.0] } else { [1.0, 0.8, 0.85, 0.7] };
-                let bob = (t * 3.0 + k as f32 * 0.5).sin() * 3.0;
-                icon_inst(w, id, v2(x0 + gap * k as f32, y + bob), s, 0.0, c);
-            }
-        }
+        // Hit points are shown by the shell's HP bar.
     }
 
     // Freed friends floating up.

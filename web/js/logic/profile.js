@@ -172,7 +172,7 @@ function normalizeProfile(raw, schema) {
   P.title = cleanText(sstr(g.title, '', 200), 40);
   P.featuresSeen = Object.fromEntries(Object.entries(obj(g.featuresSeen)).filter(([k, v]) => /^[a-z][a-z0-9_]{0,31}$/.test(k) && typeof v === 'boolean').slice(0, 64));
   P.placementDone = bool(g.placementDone, false);
-  P.lastRoundType = ['normal', 'tutorial', 'boss', 'mixup', 'quick_check'].includes(g.lastRoundType) ? g.lastRoundType : null;
+  P.lastRoundType = ['normal', 'tutorial', 'boss', 'mixup', 'revision', 'quick_check'].includes(g.lastRoundType) ? g.lastRoundType : null;
   P.lastRoundAccuracy = g.lastRoundAccuracy == null ? null : num(g.lastRoundAccuracy, null, 0, 1);
   P.lastRoundStars = g.lastRoundStars == null ? null : int(g.lastRoundStars, null, 1, 4);
   P.lastEvent = typeof g.lastEvent === 'string' && /^[a-z_]{1,32}$/.test(g.lastEvent) ? g.lastEvent : null;
@@ -198,6 +198,7 @@ function normalizeProfile(raw, schema) {
       bossBeaten: bool(t.bossBeaten, false), bossPending: bool(t.bossPending, false),
       masteredDay: isDay(t.masteredDay) ? t.masteredDay : null,
       roundsOpen: int(t.roundsOpen, 0, 0, 1e9), speedWaiverCount: int(t.speedWaiverCount, 0, 0, 1e9),
+      bossMedal: int(t.bossMedal, 0, 0, 3), bossWins: int(t.bossWins, 0, 0, 1e9),
     };
   }
 
@@ -227,7 +228,7 @@ function normalizeProfile(raw, schema) {
   for (const slot of ['hat', 'face', 'back']) if (A.equipped[slot] && !C.avatarItems.includes(A.equipped[slot])) A.equipped[slot] = null;
 
   p.history = arr(raw.history).filter((h) => h && typeof h === 'object').slice(-TUNING.historyKeep).map((h) => ({
-    round: int(h.round, 0, 0, 1e9), at: sstr(h.at, '', 40), type: ['normal', 'tutorial', 'boss', 'mixup', 'quick_check'].includes(h.type) ? h.type : 'normal', table: h.table == null ? null : int(h.table, null, 1, 12),
+    round: int(h.round, 0, 0, 1e9), at: sstr(h.at, '', 40), type: ['normal', 'tutorial', 'boss', 'mixup', 'revision', 'quick_check'].includes(h.type) ? h.type : 'normal', table: h.table == null ? null : int(h.table, null, 1, 12),
     sums: int(h.sums, 0, 0, 1e4), correct: int(h.correct, 0, 0, 1e4), wrong: int(h.wrong, 0, 0, 1e4), escapes: int(h.escapes, 0, 0, 1e4),
     stars: int(h.stars, 1, 0, 4), score: int(h.score, 0, 0, 1e9), xp: int(h.xp, 0, 0, 1e7), sparks: int(h.sparks, 0, 0, 1e7),
     medianRtMs: h.medianRtMs == null ? null : int(h.medianRtMs, null, 0, 6e5), xStart: num(h.xStart, 0, -1, 5), xEnd: num(h.xEnd, 0, -1, 5),

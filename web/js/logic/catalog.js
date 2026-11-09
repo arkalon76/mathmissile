@@ -37,7 +37,7 @@ export const SPECIES = [
   S('splitsy', 'Splitsy', 0, 'special', '#b2ff59', '#64dd17', 'blob'),
   S('chillby', 'Chillby', 0, 'special', '#b3e5fc', '#4fc3f7', 'puff'),
 ];
-for (const T of PATH) {
+for (const T of [...PATH].sort((a, b) => a - b)) {
   const a = SPECIES.find((s) => s.island === T && s.kind === 'A');
   SPECIES.push({ ...a, id: `grand_${a.id}`, name: `Grand ${a.name}`, kind: 'grand', base: a.id });
 }
@@ -175,7 +175,7 @@ export const BADGES = [
   B('split_second', 'Split Second', '✂️'),
   B('chill_out', 'Chill Out', '🧊'),
   B('boss_basher', 'Boss Basher', '👊', { goal: 3, stat: 'bosses' }),
-  ...PATH.map((T) => B(`island_hero_${T}`, `Island Hero ${T}`, '🏝️', { table: T })),
+  ...[...PATH].sort((a, b) => a - b).map((T) => B(`island_hero_${T}`, `Island Hero ${T}`, '🏝️', { table: T })),
   B('halfway_hero', 'Halfway Hero', '🌗', { goal: 6, stat: 'tablesKnown' }),
   B('times_table_legend', 'Times Table Legend', '🏅', { goal: 12, stat: 'tablesKnown' }),
   B('golden_crown', 'Golden Crown', '👑'),

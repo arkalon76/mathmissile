@@ -10,6 +10,7 @@ import { updateTableAfterRound, openTable, nextLockedAfter, knownTables, current
 import { xpNeed, levelForXp, levelProgress, starsFor, roundSparks, accuracyOf } from './progression.js';
 import { xEff, clampOffset } from './speed.js';
 import { median } from './tables.js';
+import { roundWeakFacts, practiceNext } from './insight.js';
 import {
   ITEMS_BY_ID, LEVEL_ITEMS, titleForLevel, titleAt, STICKERS, BADGES, BADGES_BY_ID, BADGE_ITEMS, BUNDLE_ITEMS,
   chestOnly, levelPool, albumPool, SPECIES_BY_ID, BASE_SPECIES, speciesOfIsland,
@@ -231,12 +232,14 @@ export function nextUp(profile) {
     return null;
   })();
   if (nextLevelItem) {
-    const need = Math.max(1, (lp.level + 1 === nextLevelItem.L) ? lp.need : lp.need * (nextLevelItem.L - lp.level));
-    c.push({ kind: 'level', icon: ITEMS_BY_ID[nextLevelItem.id].icon, label: `Level ${nextLevelItem.L}`, have: lp.into, need, item: nextLevelItem.id });
+    // XP still to earn up to that level, counted level by level.
+    let need = 0;
+    for (let L = lp.level; L < nextLevelItem.L; L++) need += xpNeed(L);
+    c.push({ kind: 'level', icon: ITEMS_BY_ID[nextLevelItem.id].icon, label: `Level ${nextLevelItem.L}: ${ITEMS_BY_ID[nextLevelItem.id].name}`, have: lp.into, need: Math.max(1, need), item: nextLevelItem.id });
   } else {
     c.push({ kind: 'level', icon: '⬆️', label: `Level ${lp.level + 1}`, have: lp.into, need: lp.need });
   }
-  c.push({ kind: 'chest', icon: '🎁', label: 'Chest', have: P.chestStars, need: TUNING.starsPerChest });
+  c.push({ kind: 'chest', icon: '🎁', label: 'Treasure chest', have: P.chestStars, need: TUNING.starsPerChest });
   if (P.wish && ITEMS_BY_ID[P.wish]?.source.shop && !owns(profile, P.wish)) {
     const it = ITEMS_BY_ID[P.wish];
     c.push({ kind: 'wish', icon: it.icon, label: it.name, have: Math.min(P.sparks, it.source.shop), need: it.source.shop, item: it.id });
@@ -248,7 +251,7 @@ export function nextUp(profile) {
     const f = st[b.stat] / b.goal;
     if (!bestBadge || f > bestBadge.f) bestBadge = { b, f };
   }
-  if (bestBadge) c.push({ kind: 'badge', icon: bestBadge.b.icon, label: bestBadge.b.name, have: st[bestBadge.b.stat], need: bestBadge.b.goal, badge: bestBadge.b.id });
+  if (bestBadge) c.push({ kind: 'badge', icon: bestBadge.b.icon, label: `Badge: ${bestBadge.b.name}`, have: st[bestBadge.b.stat], need: bestBadge.b.goal, badge: bestBadge.b.id });
   let bestSp = null;
   for (const [id, d] of Object.entries(profile.collection.dex)) {
     if (!d.met || !SPECIES_BY_ID[id] || SPECIES_BY_ID[id].kind === 'grand') continue;
@@ -257,11 +260,11 @@ export function nextUp(profile) {
     const f = d.pops / goal;
     if (!bestSp || f > bestSp.f) bestSp = { id, f, have: d.pops, need: goal };
   }
-  if (bestSp) c.push({ kind: 'stamp', icon: '💌', label: SPECIES_BY_ID[bestSp.id].name, have: bestSp.have, need: bestSp.need, species: bestSp.id });
+  if (bestSp) c.push({ kind: 'stamp', icon: '💌', label: `Friends with ${SPECIES_BY_ID[bestSp.id].name}`, have: bestSp.have, need: bestSp.need, species: bestSp.id });
   const C = currentTable(profile);
   if (C != null) {
     const lit = tableFacts(C).filter((k) => Math.max(profile.facts[k]?.box ?? 0, profile.facts[k]?.bestBox ?? 0) >= 3).length;
-    c.push({ kind: 'lanterns', icon: '🏮', label: `Island ${C}`, have: lit, need: 12, table: C });
+    c.push({ kind: 'lanterns', icon: '🏮', label: `Light ×${C}`, have: lit, need: 12, table: C });
   }
   return c.filter((x) => x.have < x.need)
     .map((x) => ({ ...x, frac: x.need ? x.have / x.need : 0 }))
@@ -387,7 +390,7 @@ export function applyRound(profile, plan, summary, { now = new Date(), today } =
   const playedTables = new Set();
   for (const r of results) { const f = factFromResult(r); if (f) { playedTables.add(f.a); playedTables.add(f.b); } }
   let newIsland = false;
-  for (const T of PATH) {
+  for (const T of [...PATH].sort((a, b) => a - b)) {
     const evs = updateTableAfterRound(profile, T, roundIndex, day, playedTables.has(T));
     for (const e of evs) R.tableEvents.push(e);
   }
@@ -396,8 +399,24 @@ export function applyRound(profile, plan, summary, { now = new Date(), today } =
     const T = plan.table;
     const t = tableRec(profile, T);
     const first = !t.bossBeaten;
+    const wasPending = t.bossPending;
     t.bossBeaten = true;
     t.bossPending = false;
+    t.bossWins = (t.bossWins || 0) + 1;
+    // Every win pays a little; the first win pays a lot.
+    P.xp += TUNING.bossWin.xp; R.xpGained += TUNING.bossWin.xp; R.xpBreakdown.push({ why: 'boss', xp: TUNING.bossWin.xp });
+    addSparks(profile, R, TUNING.bossWin.sparks, 'boss');
+    // Medal: 1 bronze (a win), 2 silver (accuracy), 3 gold (accuracy + speed).
+    const [, silver, gold] = TUNING.bossMedalAcc;
+    const fastOk = medRt != null && medRt <= target;
+    const medal = accuracy >= gold && fastOk ? 3 : accuracy >= silver ? 2 : 1;
+    R.bossMedal = medal;
+    R.bossMedalBefore = t.bossMedal || 0;
+    if (medal > (t.bossMedal || 0)) {
+      t.bossMedal = medal;
+      R.cards.push({ type: 'medal', table: T, medal });
+      if (!first) rollChest(profile, 'boss', rng, R);
+    }
     if (first) {
       P.bossesBeaten += 1;
       P.xp += TUNING.xp.boss; R.xpGained += TUNING.xp.boss; R.xpBreakdown.push({ why: 'boss', xp: TUNING.xp.boss });
@@ -408,8 +427,10 @@ export function applyRound(profile, plan, summary, { now = new Date(), today } =
       R.cards.push({ type: 'boss', table: T, species: grand, newFriend: sb.id });
       for (const it of BUNDLE_ITEMS[T] || []) if (grantItem(profile, it)) R.cards.push({ type: 'item', id: it });
       rollChest(profile, 'boss', rng, R);
-      if (profile.settings.tableMode === 'guided') {
-        const next = nextLockedAfter(profile, T);
+      // Guided mode: beating the island's boss (after learning it) opens the
+      // earliest island still locked, so no island is skipped.
+      if (profile.settings.tableMode === 'guided' && (wasPending || ['known', 'mastered'].includes(t.state))) {
+        const next = PATH.find((U) => profile.tables[U]?.state === 'locked' || !profile.tables[U]);
         if (next != null && openTable(profile, next, roundIndex)) {
           newIsland = true;
           const already = sharedFactsOfTable(next).filter((k) => (profile.facts[k]?.bestBox ?? 0) >= 3).length;
@@ -483,7 +504,7 @@ export function applyRound(profile, plan, summary, { now = new Date(), today } =
   if (plan.event === 'sticker_storm') giveSticker(profile, rng, R);
 
   // 9. Chest meter, Hello chest.
-  let meter = st.total + (plan.type === 'mixup' && st.stars >= 2 ? 1 : 0);
+  let meter = st.total + ((plan.type === 'mixup' || plan.type === 'revision') && st.stars >= 2 ? 1 : 0);
   P.chestStars += meter;
   while (P.chestStars >= TUNING.starsPerChest) {
     P.chestStars -= TUNING.starsPerChest;
@@ -513,7 +534,7 @@ export function applyRound(profile, plan, summary, { now = new Date(), today } =
   b('best_friends', Object.values(profile.collection.dex).some((d) => d.stamps.includes('best')));
   b('shiny_spotter', Object.values(profile.collection.dex).some((d) => d.shiny));
   b('sticker_star', !!R.flags.pageDone);
-  b('mix_master', plan.type === 'mixup' && st.stars >= 3);
+  b('mix_master', (plan.type === 'mixup' || plan.type === 'revision') && st.stars >= 3);
   statBadges(profile, day, R);
 
   // 11. Level ups (after all XP, including badges and stamps).
@@ -526,13 +547,18 @@ export function applyRound(profile, plan, summary, { now = new Date(), today } =
     R.cards.push({ type: 'nudge' });
   }
 
+  // 12b. Where to improve: this round's sums that need more practice, and the
+  // tables to practise next (shown on the reward screen; never a wrong count).
+  R.weakFacts = roundWeakFacts(results, target, factFromResult).slice(0, 4);
+  R.practiceNext = practiceNext(profile, 3).map((t) => ({ table: t.T, level: t.level, weakest: t.weakest.slice(0, 3) }));
+
   // 13. Bookkeeping.
   P.lastRoundType = plan.type;
   P.lastRoundAccuracy = accuracy;
   P.lastRoundStars = st.total;
   P.lastEvent = plan.event || null;
   if (plan.owesMixup) P.mixupOwed = true;
-  else if (plan.type === 'mixup') P.mixupOwed = false;
+  else if (plan.type === 'mixup' || plan.type === 'revision') P.mixupOwed = false;
   profile.history.push({
     round: roundIndex, at: now.toISOString(), day, type: plan.type, table: plan.table, seed: plan.seed,
     sums: results.length, correct, wrong, escapes, stars: st.total, score: R.score, xp: R.xpGained, sparks: R.sparksGained,

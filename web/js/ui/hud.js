@@ -13,7 +13,10 @@ export function createHud(app) {
   const charge = h('div', { class: 'charge empty', 'aria-label': 'Charged number' }, h('span', { class: 'charge-blade', 'aria-hidden': 'true' }, '🗡️'), chargeVal);
   const combo = h('div', { class: 'hud-combo', 'data-tier': '0' });
   const dots = h('div', { class: 'hud-progress' });
-  const hearts = h('div', { class: 'hud-hearts', hidden: true });
+  // Boss HP bar (one notch per sum; the boss's name above it).
+  const hpFill = h('div', { class: 'hp-fill' });
+  const hpName = h('div', { class: 'hp-name' }, '');
+  const hearts = h('div', { class: 'hud-boss', hidden: true }, hpName, h('div', { class: 'hp-bar' }, hpFill));
   const shout = h('div', { class: 'hud-shout', 'aria-live': 'polite' });
   const score = h('div', { class: 'hud-score' }, '0');
   root.append(h('div', { class: 'hud-top' }, pause, h('div', { class: 'hud-mid' }, dots, hearts), h('div', { class: 'hud-right' }, combo, score)), charge, shout);
@@ -53,8 +56,9 @@ export function createHud(app) {
       dots.hidden = isBoss;
       hearts.hidden = !isBoss;
       if (isBoss) {
-        clear(hearts);
-        for (let i = 0; i < plan.config.boss.hp; i++) hearts.appendChild(h('i', null, '❤️'));
+        hpName.textContent = `×${plan.table} Boss`;
+        hpFill.style.width = '100%';
+        hearts.dataset.phase = '1';
       }
       setCombo(0, 0);
       score.textContent = '0';
@@ -81,6 +85,9 @@ export function createHud(app) {
           else if (!ev.tricky_cleared) app.audio.voice(PRAISE[(Math.random() * PRAISE.length) | 0], { praise: true });
           break;
         case 'wrong':
+          if (isBoss) showShout('Hee hee! 😜', 'boss');
+          if (ev.graded !== false && !ev.golden && !ev.mini && ev.kind !== 'repeat') markDot(ev.type);
+          break;
         case 'escaped':
           if (ev.graded !== false && !ev.golden && !ev.mini && ev.kind !== 'repeat') markDot(ev.type);
           break;
@@ -90,12 +97,15 @@ export function createHud(app) {
         case 'combo_break': setCombo(0, 0); break;
         case 'blade_broken': app.els.stage.classList.add('broken'); break;
         case 'blade_ready': app.els.stage.classList.remove('broken'); break;
-        case 'boss_hit': {
-          const kids = hearts.children;
-          for (let i = 0; i < kids.length; i++) kids[i].classList.toggle('gone', i >= ev.hp);
+        case 'boss_hit':
+          hpFill.style.width = `${Math.round((100 * ev.hp) / Math.max(1, ev.max_hp))}%`;
+          hearts.classList.remove('hit'); void hearts.offsetWidth; hearts.classList.add('hit');
           break;
-        }
-        case 'boss_defeated': showShout('You did it! 🏆', 'fixed'); break;
+        case 'boss_phase':
+          hearts.dataset.phase = String(ev.phase);
+          showShout(ev.phase >= 3 ? 'Almost there! 💥' : "He's mad! 😠", 'boss');
+          break;
+        case 'boss_defeated': showShout('You beat the Boss! 🏆', 'fixed'); break;
         default: break;
       }
     },

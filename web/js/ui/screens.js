@@ -4,8 +4,9 @@
 import { h, btn, bar, clear, wait, burst } from './dom.js';
 import { monsterArt, avatarArt } from './art.js';
 import { showReward } from './reward.js';
-import { PATH, tableFacts } from '../logic/facts.js';
-import { tableState, currentTable } from '../logic/tables.js';
+import { TABLES, tableFacts, homeTable, factKey } from '../logic/facts.js';
+import { tableState, currentTable, pendingBoss, isOpenState } from '../logic/tables.js';
+import { tableStrengths, practiceNext } from '../logic/insight.js';
 import { levelProgress } from '../logic/progression.js';
 import { AVATARS, SPECIES, SPECIES_BY_ID, ITEMS, ITEMS_BY_ID, STICKERS, BADGES } from '../logic/catalog.js';
 import { TUNING } from '../logic/tuning.js';
@@ -120,7 +121,8 @@ function map(app) {
   const lp = levelProgress(p.progress.xp);
   const C = currentTable(p);
   const path = h('div', { class: 'island-path' });
-  PATH.forEach((T, i) => {
+  // Islands are shown 1..12 in number order; the next one to learn is outlined.
+  TABLES.forEach((T, i) => {
     const inf = islandInfo(p, T);
     const open = inf.st !== 'locked';
     const isl = h('button', { type: 'button', class: ['island', `st-${inf.st}`, T === C ? 'current' : '', inf.boss ? 'has-boss' : ''],
@@ -128,11 +130,12 @@ function map(app) {
       onclick: () => {
         if (!open) { isl.classList.remove('shake'); void isl.offsetWidth; isl.classList.add('shake'); app.audio.play('sfx_ui_back'); return; }
         app.audio.play('sfx_ui_tap');
-        if (inf.boss) app.play({ boss: T });
-        else app.play({ table: T });
+        islandSheet(app, T);
       } },
-      h('div', { class: 'island-num' }, open ? `×${T}` : '🔒'),
+      h('div', { class: 'island-num' }, `×${T}`),
+      open ? null : h('div', { class: 'island-lock', 'aria-hidden': 'true' }, '🔒'),
       open ? h('div', { class: 'lanterns', 'aria-label': `${inf.lit} of 12` }, ...Array.from({ length: 12 }, (_, k) => h('i', { class: k < inf.lit ? 'lit' : '' }))) : null,
+      p.tables[T]?.bossMedal ? h('div', { class: 'island-medal', 'aria-label': 'Boss medal' }, MEDALS[p.tables[T].bossMedal]) : null,
       inf.crown ? h('div', { class: 'island-badge crown' }, '👑') : inf.boss ? h('div', { class: 'island-badge boss' }, monsterArt(`grand_${islandA(T)}`, { size: 40 })) : inf.st === 'known' ? h('div', { class: 'island-badge' }, '⭐') : null);
     path.appendChild(isl);
   });
@@ -142,7 +145,7 @@ function map(app) {
     btn({ icon: '📒', label: 'Stickers', onClick: () => { app.audio.voice('vo_sticker_book'); app.show('stickers'); } }),
     btn({ icon: '🏅', label: 'Badges', onClick: () => app.show('badges') }),
     btn({ icon: workshopOpen ? '🛠️' : '🔒', label: 'Workshop', cls: workshopOpen ? '' : 'locked', onClick: () => {
-      if (!workshopOpen) { app.toast(`🔒 ${TUNING.workshopRound - p.progress.roundIndex} ▶`); return; }
+      if (!workshopOpen) { app.toast(`🔒 Play ${TUNING.workshopRound - p.progress.roundIndex} more rounds`); return; }
       app.show('workshop');
     } }));
   return h('div', { class: 'map' },
@@ -157,8 +160,77 @@ function map(app) {
         btn({ icon: '⚙️', cls: 'round small', aria: 'Settings', onClick: () => app.show('settings') }),
         btn({ icon: '👥', cls: 'round small', aria: 'Switch player', onClick: () => app.show('profiles') }))),
     path,
-    h('div', { class: 'play-row' }, btn({ icon: '▶', label: 'Play', cls: 'huge primary pulse', onClick: () => app.play() })),
+    h('div', { class: 'play-row' },
+      btn({ icon: pendingBoss(p) != null ? '⚔️' : '▶', label: pendingBoss(p) != null ? `Boss ×${pendingBoss(p)}!` : 'Play', cls: 'huge primary pulse', onClick: () => app.play() }),
+      canRevise(p) ? btn({ icon: '🔁', label: 'Revision', cls: 'big revise-btn', onClick: () => app.show('revision') }) : null),
     nav);
+}
+
+const MEDALS = ['', '🥉', '🥈', '🥇'];
+
+/** Revision needs a few facts from at least 2 tables. */
+function canRevise(p) {
+  return tableStrengths(p).filter((t) => t.met >= 3).length >= 2;
+}
+
+/**
+ * Island sheet: what you can do on this island. "Practise ×T" plays only T's
+ * sums; "Boss" fights the island's boss (any open island; again any time).
+ */
+function islandSheet(app, T) {
+  const p = app.profile;
+  const t = p.tables[T] || {};
+  const info = tableStrengths(p).find((x) => x.T === T);
+  const medal = t.bossMedal || 0;
+  const level = { strong: '💪 Strong', good: '👍 Good', practice: '🌱 Needs practice', new: '✨ New' }[info.level];
+  app.modal((close) => h('div', { class: 'island-sheet' },
+    h('div', { class: 'is-head' },
+      monsterArt(`grand_${islandA(T)}`, { size: 110, silhouette: !t.bossBeaten }),
+      h('div', null,
+        h('div', { class: 'is-title' }, `×${T} Island`),
+        h('div', { class: 'is-level' }, level),
+        h('div', { class: 'is-medals', 'aria-label': `Boss medal: ${['none', 'bronze', 'silver', 'gold'][medal]}` },
+          ...[1, 2, 3].map((m) => h('span', { class: m <= medal ? 'won' : 'not' }, MEDALS[m]))))),
+    h('div', { class: 'is-buttons' },
+      btn({ icon: '▶', label: `Practise ×${T}`, cls: 'big primary', onClick: () => { close(); app.play({ table: T }); } }),
+      btn({ icon: '⚔️', label: t.bossBeaten ? 'Boss again' : 'Fight the Boss', cls: 'big boss-btn', onClick: () => { close(); app.play({ boss: T }); } })),
+    h('div', { class: 'is-note' }, `▶ only ×${T} sums  ·  ⚔️ all 12 of ×${T}`),
+    btn({ icon: '✖', cls: 'round small', aria: 'Close', onClick: close })));
+}
+
+// ---- revision -----------------------------------------------------------------------
+
+/**
+ * Revision: every table the child has met, strongest to weakest as colours,
+ * and the tables that need practice first. "Revise everything" plays a mixed
+ * round weighted to the weak facts; a table button plays just that table.
+ */
+function revision(app) {
+  const p = app.profile;
+  const st = tableStrengths(p);
+  const nextUp = practiceNext(p, 3);
+  const grid = h('div', { class: 'rev-grid' }, ...st.map((t) => {
+    const pct = t.strength == null ? 0 : Math.round(t.strength * 100);
+    return h('button', { type: 'button', class: ['rev-cell', `lv-${t.level}`, t.open ? '' : 'locked'], disabled: !t.open,
+      'aria-label': `×${t.T}: ${t.level}`, onclick: () => { app.audio.play('sfx_ui_tap'); app.play({ table: t.T }); } },
+    h('div', { class: 'rev-num' }, `×${t.T}`),
+    t.open ? bar(pct / 100, 'rev-bar') : h('div', { class: 'rev-lock' }, '🔒'),
+    h('div', { class: 'rev-word' }, t.open ? { strong: '💪', good: '👍', practice: '🌱', new: '✨' }[t.level] : ''));
+  }));
+  return h('div', { class: 'revision' },
+    topBar(app, { title: '🔁 Revision' }),
+    h('div', { class: 'rev-intro' }, 'Practise all your numbers!'),
+    btn({ icon: '▶', label: 'Revise everything', cls: 'huge primary pulse', onClick: () => app.play({ revision: true }) }),
+    nextUp.length ? h('div', { class: 'practice-next' },
+      h('div', { class: 'pn-title' }, '🌱 Needs practice'),
+      h('div', { class: 'pn-tables' }, ...nextUp.map((t) => h('div', { class: 'pn-table' },
+        btn({ icon: '▶', label: `×${t.T}`, cls: 'big', onClick: () => app.play({ table: t.T }) }),
+        h('div', { class: 'pn-facts' }, ...t.weakest.slice(0, 3).map((k) => {
+          const [a, b] = k.split('x');
+          return h('span', { class: 'chip' }, `${a}×${b}`);
+        })))))) : h('div', { class: 'rev-allgood' }, '💪 Everything you know is strong!'),
+    grid,
+    h('div', { class: 'rev-key' }, '💪 strong  ·  👍 good  ·  🌱 needs practice  ·  ✨ new'));
 }
 
 const islandA = (T) => SPECIES.find((s) => s.island === T && s.kind === 'A')?.id || 'bloop';
@@ -172,10 +244,10 @@ async function preround(app, plan) {
   root.className = 'screen screen-preround';
   const icon = plan.type === 'boss' ? monsterArt(`grand_${islandA(plan.table)}`, { size: 150 })
     : plan.type === 'tutorial' ? monsterArt('bloop', { size: 130 })
-      : h('div', { class: 'pre-icon' }, plan.type === 'mixup' ? '🔀' : { golden_hour: '🌅', bubble_breeze: '🫧', night_glow: '🌙', monster_parade: '🎉', sticker_storm: '🌈' }[plan.event] || `×${plan.table ?? '?'}`);
+      : h('div', { class: 'pre-icon' }, plan.type === 'revision' ? '🔁' : plan.type === 'mixup' ? '🔀' : { golden_hour: '🌅', bubble_breeze: '🫧', night_glow: '🌙', monster_parade: '🎉', sticker_storm: '🌈' }[plan.event] || `×${plan.table ?? '?'}`);
   const count = h('div', { class: 'countdown' }, '');
-  root.appendChild(h('div', { class: 'preround' }, icon,
-    plan.type === 'tutorial' ? h('div', { class: 'pre-hint' }, '⌨️ 7  ➜  👆 ', h('span', { class: 'hint-fact' }, '1×7')) : null,
+  root.appendChild(h('div', { class: 'preround' }, icon, roundContents(plan),
+    plan.type === 'tutorial' ? h('div', { class: 'pre-hint' }, '⌨️ 3  ➜  👆 ', h('span', { class: 'hint-fact' }, '1×3')) : null,
     count));
   if (plan.type === 'boss') app.audio.play('sfx_boss_enter');
   app.audio.play('sfx_round_start');
@@ -191,13 +263,35 @@ async function preround(app, plan) {
   clear(root);
 }
 
+/**
+ * "What is in this round" line under the pre-round icon, so extra tables never
+ * come as a surprise: "Only ×7", or "×3  +  🔁 ×1 ×2" for practice of old tables.
+ */
+function roundContents(plan) {
+  if (plan.type === 'tutorial') return null;
+  const T = plan.table;
+  const others = new Set();
+  for (const s of plan.deck || []) {
+    if (T != null && (s.a === T || s.b === T)) continue;
+    others.add(homeTable(factKey(s.a, s.b)));
+  }
+  const chips = [...others].sort((x, y) => x - y).map((n) => h('span', { class: 'chip' }, `×${n}`));
+  if (plan.type === 'boss') return h('div', { class: 'pre-contents' }, h('span', { class: 'chip main' }, `×${T}`), h('span', null, ' Boss!'));
+  if (plan.type === 'revision') return h('div', { class: 'pre-contents' }, h('span', null, 'Revision '), ...chips);
+  if (T == null || plan.type === 'mixup') return h('div', { class: 'pre-contents' }, h('span', null, '🔁 '), ...chips);
+  if (!chips.length) return h('div', { class: 'pre-contents' }, h('span', null, 'Only '), h('span', { class: 'chip main' }, `×${T}`));
+  return h('div', { class: 'pre-contents' }, h('span', { class: 'chip main' }, `×${T}`), h('span', null, ' + 🔁 '), ...chips);
+}
+
 // ---- Monster Book ------------------------------------------------------------------
 
 function book(app) {
   const p = app.profile;
   const dex = p.collection.dex;
   const grid = h('div', { class: 'dex-grid' });
-  for (const sp of SPECIES) {
+  const KIND = { A: 0, B: 1, grand: 2 };
+  const bookOrder = [...SPECIES].sort((x, y) => (x.island || 99) - (y.island || 99) || (KIND[x.kind] ?? 3) - (KIND[y.kind] ?? 3));
+  for (const sp of bookOrder) {
     const d = dex[sp.id];
     const met = !!d?.met;
     const cell = h('button', { type: 'button', class: ['dex-cell', met ? 'met' : 'unknown', sp.kind === 'grand' ? 'grand' : ''],
@@ -270,7 +364,7 @@ function badges(app) {
 
 function sourceHint(it) {
   const s = it.source;
-  if (s.level) return `⬆️ ${s.level}`;
+  if (s.level) return `🔒 Level ${s.level}`;
   if (s.shop) return `✨ ${s.shop}`;
   if (s.chest) return '🎁';
   if (s.album) return '📒';
@@ -397,5 +491,5 @@ function breakNudge(app, next) {
 
 function reward(app, args) { return showReward(app, args); }
 
-export const SCREENS = { title, profiles, create, map, preround, book, stickers, badges, workshop, settings, breakNudge, reward };
+export const SCREENS = { title, profiles, create, map, preround, revision, book, stickers, badges, workshop, settings, breakNudge, reward };
 export { wantsTouchPad };

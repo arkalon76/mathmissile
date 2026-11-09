@@ -26,7 +26,7 @@ test('first round is the tutorial: 1×1..1×5 ghosted then repeated', () => {
   assert.equal(plan.type, 'tutorial');
   assert.equal(plan.config.deck.length, 10);
   const ghosts = plan.config.deck.filter((s) => s.ghost).map(keyOf);
-  assert.deepEqual(ghosts.sort(), ['1x1', '1x10', '1x2', '1x3', '1x5'].sort());
+  assert.deepEqual(ghosts.sort(), ['1x1', '1x2', '1x3', '1x4', '1x5'].sort());
   for (const k of ghosts) assert.equal(plan.config.deck.filter((s) => keyOf(s) === k).length, 2);
 });
 
@@ -67,13 +67,31 @@ test('tricky facts are tagged and included', () => {
   assert.ok(t.some((s) => s.tricky && s.tricky_need === 3));
 });
 
-test('boss round: the 12 facts of the table, each once', () => {
+test('boss round: every fact of the table, plus 3 repeats late in the fight; hp = sums', () => {
   const p = newProfile();
   play(p, 2);
-  const plan = planRound(p, { seed: 5, today: '2026-11-05', choice: { boss: 1 } });
+  for (let seed = 1; seed <= 20; seed++) {
+    const plan = planRound(p, { seed, today: '2026-11-05', choice: { boss: 1 } });
+    assert.equal(plan.type, 'boss');
+    const keys = plan.config.deck.map(keyOf);
+    assert.deepEqual([...new Set(keys)].sort(), [...tableFacts(1)].sort());
+    assert.equal(keys.length, 12 + 3);
+    assert.equal(plan.config.boss.hp, keys.length);
+    // A repeat never comes before the middle of the fight.
+    const firstSeen = new Set();
+    keys.forEach((k, i) => { if (firstSeen.has(k)) assert.ok(i >= 6, `repeat of ${k} at ${i}`); firstSeen.add(k); });
+  }
+});
+
+test('boss round on a table opened by a parent: facts never met are ghosted', () => {
+  const p = newProfile();
+  play(p, 2);
+  openTable(p, 7, p.progress.roundIndex);
+  const plan = planRound(p, { seed: 4, today: '2026-11-05', choice: { boss: 7 } });
   assert.equal(plan.type, 'boss');
-  assert.deepEqual(plan.config.deck.map(keyOf).sort(), [...tableFacts(1)].sort());
-  assert.equal(plan.config.boss.hp, 12);
+  const ghosts = plan.config.deck.filter((s) => s.ghost).map(keyOf);
+  assert.ok(ghosts.length > 0);
+  for (const k of ghosts) assert.equal(p.facts[k]?.introduced ?? false, false);
 });
 
 test('little band plays fewer sums than big band at the same speed', () => {
@@ -84,4 +102,22 @@ test('little band plays fewer sums than big band at the same speed', () => {
   const nl = planRound(little, { seed: 9, today: '2026-11-05' }).config.deck.length;
   const nb = planRound(big, { seed: 9, today: '2026-11-05' }).config.deck.length;
   assert.ok(nl < nb, `${nl} < ${nb}`);
+});
+
+test('picking a table on the map plays only that table, even with every table open', () => {
+  const p = newProfile();
+  play(p, 6);
+  for (let T = 1; T <= 12; T++) openTable(p, T, p.progress.roundIndex);
+  for (let seed = 1; seed <= 30; seed++) {
+    const plan = planRound(p, { seed, today: '2026-11-05', choice: { table: 7 } });
+    assert.equal(plan.type, 'normal');
+    assert.ok(plan.config.deck.length >= 12, `deck length ${plan.config.deck.length}`);
+    for (const s of plan.config.deck) assert.ok(s.a === 7 || s.b === 7, `seed ${seed}: ${s.a}×${s.b} is not a 7s sum`);
+    for (const g of plan.config.golden) assert.ok(g.a === 7 || g.b === 7, `golden ${g.a}×${g.b}`);
+    // New facts are shown with the answer before any other copy.
+    for (const k of plan.newKeys) {
+      const idx = plan.config.deck.map((s, i) => (keyOf(s) === k ? i : -1)).filter((i) => i >= 0);
+      assert.ok(plan.config.deck[idx[0]].ghost, `${k} first appearance is ghosted`);
+    }
+  }
 });

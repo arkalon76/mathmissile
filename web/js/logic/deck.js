@@ -4,11 +4,12 @@
 
 import { TUNING } from './tuning.js';
 import { makeRng, weightedSample } from './rng.js';
-import { PATH, tableFacts, parseKey, homeTable, isSquare, answerOf, orient } from './facts.js';
+import { PATH, tableFacts, factKey, parseKey, homeTable, isSquare, answerOf, orient } from './facts.js';
 import { factWeight, isDue } from './srs.js';
 import { currentTable, knownTables, pendingBoss, tableState, isOpenState, factIsOpen } from './tables.js';
 import { xEff, sumsFor } from './speed.js';
 import { speciesOfIsland, SPECIES_BY_ID } from './catalog.js';
+import { factStrength } from './insight.js';
 
 const bandCfg = (p) => TUNING.bands[p.ageBand] || TUNING.bands.big;
 
@@ -16,8 +17,14 @@ const bandCfg = (p) => TUNING.bands[p.ageBand] || TUNING.bands.big;
 export function pickRoundType(profile, rng, choice = {}) {
   const next = profile.progress.roundIndex + 1;
   if (profile.progress.roundIndex === 0) return { type: 'tutorial', table: 1 };
+  if (choice.revision) return { type: 'revision', table: null };
   if (choice.boss != null) return { type: 'boss', table: choice.boss, replay: !!profile.tables[choice.boss]?.bossBeaten };
-  if (choice.table != null) return { type: 'normal', table: choice.table };
+  // A table the child picked on the map: that table only (see practiceDeck).
+  // A Mix-Up slot that a picked table takes is owed, not lost.
+  if (choice.table != null) {
+    const owes = knownTables(profile).length >= TUNING.mixupMinKnown && next % TUNING.mixupEvery === 0;
+    return { type: 'normal', table: choice.table, chosen: true, owesMixup: owes };
+  }
   const boss = pendingBoss(profile);
   if (boss != null) return { type: 'boss', table: boss };
   const known = knownTables(profile).length;
@@ -130,12 +137,16 @@ export function planRound(profile, { seed, today, choice = {}, offset = profile.
 
   if (type === 'tutorial') {
     // 1×1..1×5 ghosted, each repeated two slots later (§6.2): 10 sums.
-    const keys = tableFacts(1).slice(0, 5);
+    const keys = [1, 2, 3, 4, 5].map((b) => factKey(1, b));
     const order = [[0, 'g'], [1, 'g'], [0, 'r'], [2, 'g'], [1, 'r'], [3, 'g'], [2, 'r'], [4, 'g'], [3, 'r'], [4, 'r']];
     deck = order.map(([i, t]) => ({ key: keys[i], kind: 'new', ghost: t === 'g', lantern: t === 'r' }));
     newKeys.push(...keys);
   } else if (type === 'boss') {
-    deck = rng.shuffle(tableFacts(C)).map((key) => ({ key, kind: 'focus', randomForm: true }));
+    deck = bossDeck(profile, C, rng, newKeys);
+  } else if (type === 'revision') {
+    deck = revisionDeck(profile, intro, sumsFor(x, band) + TUNING.revisionExtra, rng, w);
+  } else if (picked.chosen) {
+    deck = practiceDeck(profile, C, sumsFor(x, band), rng, w, bc, newKeys);
   } else {
     const N = sumsFor(x, band);
     deck = new Array(N).fill(null);
@@ -231,8 +242,10 @@ export function planRound(profile, { seed, today, choice = {}, offset = profile.
   const littleBand = band === 'little';
   if (type !== 'tutorial' && type !== 'boss') {
     // Goldfluff: extra, a Known fact.
-    const goldCands = intro.filter((k) => rec(k).box >= 3);
-    const goldPool = goldCands.length ? goldCands : intro;
+    // A picked table keeps even the bonus monsters on that table.
+    const goldBase = picked.chosen ? intro.filter((k) => tableFacts(C).includes(k)) : intro;
+    const goldCands = goldBase.filter((k) => rec(k).box >= 3);
+    const goldPool = goldCands.length ? goldCands : goldBase;
     let golds = 0;
     if (roundsOk(3) && goldPool.length) {
       if (event === 'golden_hour') golds = 2;
@@ -282,7 +295,8 @@ export function planRound(profile, { seed, today, choice = {}, offset = profile.
 
   const config = {
     seed,
-    round_type: type,
+    // A revision round looks and plays like a Mix-Up in the engine.
+    round_type: type === 'revision' ? 'mixup' : type,
     event,
     band,
     target_ms: profile.settings.targetMs,
@@ -299,14 +313,120 @@ export function planRound(profile, { seed, today, choice = {}, offset = profile.
     }),
     golden: specials.golden.map(({ a, b }) => ({ a, b })),
     mini_pool: specials.splitter ? miniPool : [],
-    boss: type === 'boss' ? { species: speciesOfIsland(C, 'A').id, hp: 12 } : null,
+    // One hit per sum: the boss's hit points are the deck length.
+    boss: type === 'boss' ? { species: speciesOfIsland(C, 'A').id, hp: deck.length } : null,
     calm: !!profile.settings.calmEffects,
   };
 
   return {
-    type, table: C, event, seed, roundIndex, today, x, replay: !!picked.replay, owesMixup: !!picked.owesMixup,
+    type, table: C, event, seed, roundIndex, today, x, replay: !!picked.replay, owesMixup: !!picked.owesMixup, choice,
     deck, specials, newKeys, config,
   };
+}
+
+/**
+ * Revision deck: every number the child has met. One sum from each table first
+ * (its weakest fact), then the rest weighted to the weakest facts; a weak fact
+ * may come twice. No new facts.
+ */
+export function revisionDeck(profile, intro, N, rng, w) {
+  const target = profile.settings.targetMs;
+  const rec = (k) => profile.facts[k];
+  const strength = (k) => factStrength(rec(k), target) ?? 0;
+  const deck = new Array(N).fill(null);
+  if (!intro.length) return [];
+  const tables = [...new Set(intro.flatMap((k) => k.split('x').map(Number)))].sort((a, b) => a - b);
+  const cover = [];
+  for (const T of rng.shuffle(tables)) {
+    if (cover.length >= Math.floor(N * 0.6)) break;
+    const opts = intro.filter((k) => k.split('x').map(Number).includes(T) && !cover.includes(k));
+    if (!opts.length) continue;
+    opts.sort((a, b) => strength(a) - strength(b));
+    cover.push(opts[0]);
+  }
+  scatter(deck, cover, 'review', rng, 3);
+  const cands = intro.map((key) => ({ key, w: 0.15 + (1 - strength(key)) * 2 + w(key) * 0.5 }));
+  fillFrom(deck, cands, 'review', rng, { maxCopies: 2, gap: 4 });
+  fillFrom(deck, cands, 'review', rng, { maxCopies: 3, gap: 2 });
+  return deck.filter(Boolean);
+}
+
+/**
+ * Boss deck (§6.5): all 12 facts of T once, shuffled, then the 3 shakiest facts
+ * again in the second half, so the fight ends on the ones that need practice.
+ * Facts never met are shown with their answer (ghost) the first time.
+ */
+export function bossDeck(profile, T, rng, newKeys = []) {
+  const rec = (k) => profile.facts[k];
+  const tf = tableFacts(T);
+  const first = rng.shuffle(tf).map((key) => {
+    if (!rec(key)?.introduced) { newKeys.push(key); return { key, kind: 'new', ghost: true, randomForm: true }; }
+    return { key, kind: 'focus', randomForm: true };
+  });
+  const score = (k) => (rec(k)?.box ?? 0) - (rec(k)?.tricky ? 0.5 : 0);
+  const shaky = rng.shuffle(tf).sort((a, b) => score(a) - score(b)).slice(0, TUNING.bossRepeats);
+  const deck = first;
+  // Each repeat goes at least 4 slots after its first appearance.
+  for (const key of shaky) {
+    const at = deck.findIndex((s) => s.key === key);
+    const lo = Math.max(at + 4, Math.floor(deck.length / 2));
+    const pos = lo >= deck.length ? deck.length : rng.int(lo, deck.length);
+    deck.splice(pos, 0, { key, kind: 'focus', randomForm: true });
+  }
+  return deck;
+}
+
+/**
+ * Deck for a table the child picked: every sum is from table T (each sum shows T),
+ * so what you pick is what you get. Facts of T not met yet come in as new
+ * (answer shown first, then again a few sums later); the rest is T's known facts,
+ * tricky ones first. Nothing from other tables is added.
+ */
+function practiceDeck(profile, T, N, rng, w, bc, newKeys) {
+  const rec = (k) => profile.facts[k];
+  const tf = tableFacts(T);
+  const deck = new Array(N).fill(null);
+  const known = tf.filter((k) => rec(k)?.introduced);
+  const fresh = tf.filter((k) => !rec(k)?.introduced);
+  // Enough new facts that the round has some variety, but each new fact costs 2 slots.
+  let nNew = Math.min(fresh.length, Math.max(bc.newPerRound, Math.min(4, 6 - known.length)));
+  // Same brakes as the guided round, counted on T's own facts: while many of
+  // T's facts are still shaky, or the last round was hard, no more new ones
+  // (beyond the 3 a round needs to have any variety).
+  const load = known.filter((k) => (rec(k).box ?? 0) <= 1).length;
+  const lastAcc = profile.progress.lastRoundAccuracy;
+  if (load >= bc.loadCap || (lastAcc != null && lastAcc < TUNING.lowAccuracyNoNew)) {
+    nNew = Math.min(nNew, Math.max(0, 3 - known.length));
+  }
+  const after = {}; // new key -> index of its second (lantern) slot; later copies go after it
+  for (const key of fresh.slice(0, nNew)) {
+    const opts = [];
+    for (let f = 1; f <= N - 4; f++) {
+      if (deck[f]) continue;
+      for (let g = TUNING.newGapMin; g <= TUNING.newGapMax; g++) if (f + g < N && !deck[f + g]) opts.push([f, f + g]);
+    }
+    if (!opts.length) break;
+    const [f, s] = rng.pick(opts);
+    deck[f] = { key, kind: 'new', ghost: true };
+    deck[s] = { key, kind: 'new', lantern: true };
+    after[key] = s;
+    newKeys.push(key);
+  }
+  const tricky = known.filter((k) => rec(k).tricky).slice(0, bc.trickySlots);
+  scatter(deck, tricky, 'tricky', rng, TUNING.trickyMinGap);
+  const pool = [...known, ...Object.keys(after)];
+  for (const [maxCopies, gap] of [[2, 4], [3, 3], [4, 2], [99, 1]]) {
+    for (let i = 0; i < N; i++) {
+      if (deck[i]) continue;
+      const ok = pool.filter((k) => (after[k] == null || i > after[k]) && copies(deck, k) < maxCopies && gapOk(deck, i, k, gap))
+        .map((key) => ({ key, w: (rec(key) ? w(key) : 1) + 0.05 }));
+      if (!ok.length) continue;
+      const fresh1 = ok.filter((c) => copies(deck, c.key) === 0);
+      const [pick] = weightedSample(rng, fresh1.length ? fresh1 : ok, 1);
+      deck[i] = { key: pick.key, kind: i < TUNING.warmupSlots ? 'warmup' : 'focus' };
+    }
+  }
+  return deck.filter(Boolean);
 }
 
 /** Monster Parade species: the most-popped species still under Best Friend (§6.4). */
