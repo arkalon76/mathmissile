@@ -46,29 +46,33 @@ export function nextSticker(profile, rng) {
   return null;
 }
 
+/** If the sticker `id` just finished its page: page Sparks, an album item and a PAGE DONE card. */
+function checkPage(profile, id, rng, R) {
+  const page = +id.slice(1, id.indexOf('_'));
+  const owned = new Set(profile.collection.stickers);
+  if (!STICKERS.filter((s) => s.page === page).every((s) => owned.has(s.id))) return false;
+  addSparks(profile, R, TUNING.pageCompleteSparks, 'page');
+  const free = albumPool().filter((i) => !owns(profile, i.id));
+  const item = free.length ? rng.pick(free).id : null;
+  if (item) grantItem(profile, item);
+  R.cards.push({ type: 'page', page, item, sparks: TUNING.pageCompleteSparks });
+  R.flags.pageDone = true;
+  return true;
+}
+
 /** Give a sticker; returns {id, pageDone} or null when the album is full. */
 function giveSticker(profile, rng, R) {
   const id = nextSticker(profile, rng);
   if (!id) { addSparks(profile, R, TUNING.pageCompleteSparks, 'album full'); return null; }
   profile.collection.stickers.push(id);
-  const page = +id.slice(1, id.indexOf('_'));
-  const owned = new Set(profile.collection.stickers);
-  const pageDone = STICKERS.filter((s) => s.page === page).every((s) => owned.has(s.id));
   R.cards.push({ type: 'sticker', id });
-  if (pageDone) {
-    addSparks(profile, R, TUNING.pageCompleteSparks, 'page');
-    const free = albumPool().filter((i) => !owns(profile, i.id));
-    const item = free.length ? rng.pick(free).id : null;
-    if (item) grantItem(profile, item);
-    R.cards.push({ type: 'page', page, item, sparks: TUNING.pageCompleteSparks });
-    R.flags.pageDone = true;
-  }
-  return { id, pageDone };
+  return { id, pageDone: checkPage(profile, id, rng, R) };
 }
 
 function addSparks(profile, R, n, why) {
   if (!n) return;
   profile.progress.sparks += n;
+  if (!R) return;
   R.sparksGained += n;
   R.sparksBreakdown.push({ why, n });
 }
@@ -91,10 +95,6 @@ export function rollChest(profile, kind, rng, R) {
   const chest = { kind, sparks: rng.int(lo, hi), items: [], stickers: [] };
   let n = TUNING.chestItems[kind] ?? 1;
   if (kind === 'level_big') n = 3;
-  if (kind === 'hello') {
-    const st = giveStickerQuiet(profile, rng);
-    if (st) chest.stickers.push(st);
-  }
   for (let i = 0; i < n; i++) {
     const pool = chestCandidates(profile);
     if (pool.length) {
@@ -103,7 +103,7 @@ export function rollChest(profile, kind, rng, R) {
       chest.items.push(it.id);
     } else {
       chest.sparks += TUNING.chestEmptyFallbackSparks;
-      const st = giveStickerQuiet(profile, rng);
+      const st = giveStickerQuiet(profile, rng, R);
       if (st) chest.stickers.push(st);
     }
   }
@@ -112,9 +112,12 @@ export function rollChest(profile, kind, rng, R) {
   return chest;
 }
 
-function giveStickerQuiet(profile, rng) {
+/** A sticker inside a chest: no card of its own, but a page it finishes still counts. */
+function giveStickerQuiet(profile, rng, R) {
   const id = nextSticker(profile, rng);
-  if (id) profile.collection.stickers.push(id);
+  if (!id) return null;
+  profile.collection.stickers.push(id);
+  checkPage(profile, id, rng, R || { cards: [], flags: {}, sparksGained: 0, sparksBreakdown: [] });
   return id;
 }
 
@@ -387,8 +390,16 @@ export function applyRound(profile, plan, summary, { now = new Date(), today } =
   if (plan.type === 'mixup') seen.mixup = true;
 
   // 4. Tables.
-  const playedTables = new Set();
-  for (const r of results) { const f = factFromResult(r); if (f) { playedTables.add(f.a); playedTables.add(f.b); } }
+  // A table counts as practised only when the round really had its sums: a stray
+  // 1×7 must not move ×1's kindness valves (§1.4).
+  const perTable = {};
+  for (const r of results) {
+    if (r.graded === false || r.golden) continue;
+    const f = factFromResult(r);
+    if (!f) continue;
+    for (const T of new Set([f.a, f.b])) perTable[T] = (perTable[T] || 0) + 1;
+  }
+  const playedTables = new Set(Object.keys(perTable).filter((T) => perTable[T] >= TUNING.valveMinSums).map(Number));
   let newIsland = false;
   for (const T of [...PATH].sort((a, b) => a - b)) {
     const evs = updateTableAfterRound(profile, T, roundIndex, day, playedTables.has(T));
@@ -503,14 +514,15 @@ export function applyRound(profile, plan, summary, { now = new Date(), today } =
   giveSticker(profile, rng, R);
   if (plan.event === 'sticker_storm') giveSticker(profile, rng, R);
 
-  // 9. Chest meter, Hello chest.
-  let meter = st.total + ((plan.type === 'mixup' || plan.type === 'revision') && st.stars >= 2 ? 1 : 0);
+  // 9. Chest meter. The first round of a new day adds a welcome-back star (it
+  // used to be a whole chest every day, which made chests feel like nothing).
+  R.welcomeStars = R.welcomeBack ? TUNING.welcomeBackStars : 0;
+  let meter = st.total + ((plan.type === 'mixup' || plan.type === 'revision') && st.stars >= 2 ? 1 : 0) + R.welcomeStars;
   P.chestStars += meter;
   while (P.chestStars >= TUNING.starsPerChest) {
     P.chestStars -= TUNING.starsPerChest;
     rollChest(profile, 'star', rng, R);
   }
-  if (R.welcomeBack) rollChest(profile, 'hello', rng, R);
 
   // 10. Round badges.
   const b = (id, cond) => { if (cond) awardBadge(profile, id, day, R); };
@@ -533,12 +545,14 @@ export function applyRound(profile, plan, summary, { now = new Date(), today } =
   b('comeback_kid', st.stars >= 3 && P.lastRoundStars === 1);
   b('best_friends', Object.values(profile.collection.dex).some((d) => d.stamps.includes('best')));
   b('shiny_spotter', Object.values(profile.collection.dex).some((d) => d.shiny));
-  b('sticker_star', !!R.flags.pageDone);
+  b('sticker_star', !!R.flags.pageDone);  // (a page finished by a level chest is checked after step 11)
   b('mix_master', (plan.type === 'mixup' || plan.type === 'revision') && st.stars >= 3);
   statBadges(profile, day, R);
 
   // 11. Level ups (after all XP, including badges and stamps).
   applyLevelUps(profile, R.levelBefore, rng, R);
+  // A level chest can finish a sticker page too; its badge XP may pass another level.
+  if (R.flags.pageDone && awardBadge(profile, 'sticker_star', day, R)) applyLevelUps(profile, P.level, rng, R);
   for (const up of R.levelUps) for (const it of up.items) if (it === 'party_hat') R.flags.putItOn = 'party_hat';
 
   // 12. Guaranteed something new (§5.10).

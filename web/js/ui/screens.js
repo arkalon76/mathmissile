@@ -8,7 +8,7 @@ import { TABLES, tableFacts, homeTable, factKey } from '../logic/facts.js';
 import { tableState, currentTable, pendingBoss, isOpenState } from '../logic/tables.js';
 import { tableStrengths, practiceNext } from '../logic/insight.js';
 import { levelProgress } from '../logic/progression.js';
-import { AVATARS, SPECIES, SPECIES_BY_ID, ITEMS, ITEMS_BY_ID, STICKERS, BADGES } from '../logic/catalog.js';
+import { AVATARS, SPECIES, SPECIES_BY_ID, ITEMS, ITEMS_BY_ID, STICKERS, BADGES, BADGES_BY_ID } from '../logic/catalog.js';
 import { TUNING } from '../logic/tuning.js';
 import { badgeStats, owns } from '../logic/rewards.js';
 import { buyItem, setWish, equip, availableSparks, reservedSparks, requestRedemption } from '../logic/shop.js';
@@ -396,6 +396,13 @@ function workshop(app, { tab = null } = {}) {
   };
   const equipped = (it) => (it.kind === 'blade' ? p.avatar.blade === it.id : it.kind === 'trail' ? p.avatar.trail === it.id
     : it.kind === 'color' ? p.avatar.colorSet === it.id : p.avatar.equipped[it.slot] === it.id);
+  // Dress Up badge (and any level it passes) shown right here, where it was earned.
+  function dressNews(news) {
+    if (!news.badge) return;
+    app.audio.play('sfx_badge');
+    const lv = news.levelUps?.length ? `  ⭐ Level ${news.levelUps[news.levelUps.length - 1].level}!` : '';
+    app.toast(`🏅 Badge: ${BADGES_BY_ID[news.badge]?.name || 'Dress Up'}!${lv}`);
+  }
   function itemCard(it) {
     const have = owns(p, it.id);
     const isOn = have && equipped(it);
@@ -403,8 +410,9 @@ function workshop(app, { tab = null } = {}) {
     const actions = [];
     if (have) {
       actions.push(btn({ icon: isOn ? '✔' : '👆', cls: isOn ? 'on small' : 'small', aria: isOn ? 'On' : 'Use', onClick: () => {
-        if (isOn && it.kind === 'avatar') equip(p, null, it.slot); else equip(p, it.id);
-        app.audio.play('sfx_ui_toggle'); app.save(); app.applyCosmetics(); render();
+        const news = {};
+        if (isOn && it.kind === 'avatar') equip(p, null, it.slot); else equip(p, it.id, undefined, news);
+        app.audio.play('sfx_ui_toggle'); app.save(); app.applyCosmetics(); render(); dressNews(news);
       } }));
     } else if (it.source.shop) {
       const can = avail >= it.source.shop;
@@ -413,8 +421,9 @@ function workshop(app, { tab = null } = {}) {
         if (r.ok) {
           app.audio.play('sfx_purchase'); app.save();
           burst(body, { n: 20 });
-          equip(p, it.id); app.applyCosmetics(); app.save();
-          render();
+          const news = {};
+          equip(p, it.id, undefined, news); app.applyCosmetics(); app.save();
+          render(); dressNews(news);
         }
       } }));
       actions.push(btn({ icon: p.progress.wish === it.id ? '💖' : '🤍', cls: 'small', aria: 'Wish', onClick: () => {

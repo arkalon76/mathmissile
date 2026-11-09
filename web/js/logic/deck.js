@@ -160,7 +160,7 @@ export function planRound(profile, { seed, today, choice = {}, offset = profile.
     warm.forEach((key, i) => { deck[i] = { key, kind: 'warmup' }; });
 
     // 2. new
-    if (C != null && type === 'normal' && event !== 'golden_hour') {
+    if (C != null && type === 'normal') { // events (Golden Hour too) never change learning (§6.4)
       let k = TUNING.newPerRoundOverride[C] ?? bc.newPerRound;
       const load = intro.filter((key) => rec(key).box <= 1).length;
       if (load >= bc.loadCap) k = 0;

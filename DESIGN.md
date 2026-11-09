@@ -150,6 +150,8 @@ Table states: `locked → open → known → mastered`.
   3. **Kindness valve**: if condition 1 has held for 8 rounds that included this table
      but condition 2 still fails, condition 2 is dropped for this table. No child stays
      stuck on one island.
+  A round "includes" a table (for both valves) only when at least 3 of its graded sums
+  contain that number, so a stray 1×7 does not count toward ×1.
 
   When a table becomes Known, the **next round is its Boss round** (§6.3). After the
   boss is beaten (which always happens), the next island opens and the reward bundle
@@ -276,7 +278,7 @@ Fill the slots in this order:
    k = newPerRound
    if count(facts with introduced && box ≤ 1) ≥ loadCap: k = 0
    if previous round first-try accuracy < 60%:          k = 0
-   if this is a Mix-Up / Boss / Event "Golden Hour":     k = 0  (see §6)
+   if this is a Mix-Up / Revision round:                 k = 0  (events never change this, §6.4)
    k = min(k, remaining un-introduced facts in C)
    ```
    Take the next k un-introduced facts of C in §1.1 order. Each new fact gets **2 slots**:
@@ -748,7 +750,8 @@ That makes 52 badges on the wall in total, counting the rows of 12, 4 and 3.
   that day.
 - Only the **total** count matters (badges at 3, 7, 14 and 30). Gaps are never shown as
   missing. There is no streak counter and no "don't break your streak".
-- The first round each day gives the Hello Chest and a "Welcome back!" voice line.
+- The first round each day adds +1 ⭐ to the chest meter ("👋 welcome back!") and plays a
+  "Welcome back!" voice line. (No daily chest: chests come from stars, levels and bosses.)
 
 ### 5.9 Island completion bundle (on boss defeat)
 
@@ -1106,9 +1109,13 @@ localStorage keys:
 Save at round end, after the reward screen is committed, after any Locker, Workshop or
 parent change, and on `visibilitychange` → hidden.
 
-Before granting rewards, the round result is written to `pendingRound`, and cleared
-once the rewards are applied. This makes a crash safe: on load, if `pendingRound`
-exists, apply it.
+While a round runs, `pendingRound` holds its seed, day, choice and start speed, and
+every answer is added to it and saved as it happens (`logic/resume.js`). It is cleared
+once the rewards are applied. This makes a crash or reload safe: on load, if
+`pendingRound` has at least 3 graded answers, the same round is re-planned from its
+seed and the answers so far are applied (speed is left as it was), and the reward
+screen shows. With fewer answers it is dropped. Leaving through the pause menu is a
+deliberate stop, so nothing is applied.
 
 ```json
 {

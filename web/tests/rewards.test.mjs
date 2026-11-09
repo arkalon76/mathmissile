@@ -54,12 +54,13 @@ test('a round report has stars, XP, Sparks, a sticker and up to 3 Next-up goals'
   assert.equal(p.progress.roundIndex, 2);
 });
 
-test('Hello chest on the first round of a new day (not on the very first day)', () => {
+test('first round of a new day: +1 welcome-back star on the chest meter, no daily chest', () => {
   const p = newProfile();
   const R = play(p, 3, { day: (i) => (i < 2 ? '2026-11-05' : '2026-11-06') });
-  assert.ok(!R[0].chests.some((c) => c.kind === 'hello'));
-  assert.ok(!R[1].chests.some((c) => c.kind === 'hello'));
-  assert.ok(R[2].chests.some((c) => c.kind === 'hello'));
+  assert.equal(R[0].welcomeStars, 0);
+  assert.equal(R[1].welcomeStars, 0);
+  assert.equal(R[2].welcomeStars, 1);
+  for (const r of R) assert.ok(!r.chests.some((c) => c.kind === 'hello'));
 });
 
 test('chest meter: a Star chest every 6 stars, remainder carries over', () => {

@@ -3,7 +3,8 @@
 
 import { TUNING } from './tuning.js';
 import { ITEMS_BY_ID, COLOR_SETS } from './catalog.js';
-import { owns, grantItem, awardBadge } from './rewards.js';
+import { owns, grantItem, awardBadge, applyLevelUps } from './rewards.js';
+import { makeRng, hashSeed } from './rng.js';
 import { cleanText, newId } from './profile.js';
 import { dayOf } from './day.js';
 
@@ -45,8 +46,12 @@ export function setWish(profile, id) {
   return true;
 }
 
-/** Equip an owned item (or null to take off an avatar slot). Gives Dress Up once. */
-export function equip(profile, id, slot) {
+/**
+ * Equip an owned item (or null to take off an avatar slot). Gives Dress Up once.
+ * The badge's XP is applied at once (level ups too), and reported in `news`
+ * ({ badge, levelUps }) so the Workshop can show it, not the next reward screen.
+ */
+export function equip(profile, id, slot, news = {}) {
   const A = profile.avatar;
   if (id == null) {
     if (['hat', 'face', 'back'].includes(slot)) { A.equipped[slot] = null; return true; }
@@ -59,7 +64,11 @@ export function equip(profile, id, slot) {
   else if (it.kind === 'color') A.colorSet = id;
   else if (it.kind === 'avatar') A.equipped[it.slot] = id;
   else return false;
-  if (it.kind === 'avatar') awardBadge(profile, 'dress_up', dayOf(new Date()), null);
+  if (it.kind === 'avatar' && awardBadge(profile, 'dress_up', dayOf(new Date()), null)) {
+    news.badge = 'dress_up';
+    const rng = makeRng(hashSeed(profile.id, 'dress_up'));
+    news.levelUps = applyLevelUps(profile, profile.progress.level, rng, null);
+  }
   return true;
 }
 

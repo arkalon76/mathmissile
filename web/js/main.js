@@ -12,6 +12,7 @@ import { decayedOffset } from './logic/speed.js';
 import { dayOf } from './logic/day.js';
 import { createSession, addPlay, shouldNudge, markNudged } from './logic/session.js';
 import { hashSeed } from './logic/rng.js';
+import { beginPending, recordEvent, canResume, partialSummary } from './logic/resume.js';
 import { h, btn, clear } from './ui/dom.js';
 import { setPortraitSource } from './ui/art.js';
 import { SCREENS } from './ui/screens.js';
@@ -49,14 +50,37 @@ app.saveDevice = () => app.store.saveDevice(app.device);
 app.selectProfile = (entry) => {
   const { profile, recovered } = app.store.loadOrRecover(entry);
   if (!profile) { toast('⚠️'); return; }
-  if (profile.pendingRound) { profile.pendingRound = null; }
+  const pending = profile.pendingRound;
+  profile.pendingRound = null;
   app.profile = profile;
   app.session = createSession({ breakMinutes: profile.settings.breakMinutes });
+  const resumed = canResume(pending) ? resumeRound(profile, pending) : null;
   app.save();
   if (recovered) toast('🩹 Save repaired');
   app.applyCosmetics();
+  if (resumed) {
+    // The page closed mid-round: the answers given so far still count (§8).
+    app.lastReport = resumed.report;
+    app.show('reward', resumed);
+    toast('💾 Your last round was saved!');
+    return;
+  }
   app.show('map');
 };
+
+/** Re-plan a round that was cut short and apply the answers saved so far. */
+function resumeRound(profile, pending) {
+  try {
+    const today = pending.today || dayOf(new Date());
+    const plan = planRound(profile, { seed: pending.seed, today, choice: pending.choice, offset: pending.offset ?? decayedOffset(profile.speed, today) });
+    if (plan.roundIndex !== pending.roundIndex) return null;
+    const report = applyRound(profile, plan, partialSummary(pending), { now: new Date(), today: dayOf(new Date()) });
+    return { report, plan };
+  } catch (err) {
+    console.warn('[resume]', err);
+    return null;
+  }
+}
 
 app.createProfile = ({ name, avatar, age }) => {
   const p = createProfile({ name, avatar, age, now: new Date() });
@@ -123,8 +147,10 @@ app.play = async (choice = {}) => {
   const today = dayOf(new Date());
   const seed = hashSeed(p.id, p.progress.roundIndex + 1, Date.now()) >>> 0;
   // Decay into the plan only; applyRound commits it (§3.3).
-  const plan = planRound(p, { seed, today, choice, offset: decayedOffset(p.speed, today) });
-  p.pendingRound = { seed, roundIndex: plan.roundIndex, startedAt: new Date().toISOString() };
+  const offset = decayedOffset(p.speed, today);
+  const plan = planRound(p, { seed, today, choice, offset });
+  p.pendingRound = beginPending(plan, { seed, today, choice, offset });
+  app.roundT0 = performance.now();
   app.save();
   app.inRound = true;
   let summary = null;
@@ -271,7 +297,12 @@ async function boot() {
   bindPointer(app.els.canvas, app.engine);
 
   app.hud = createHud(app);
-  app.runner = new RoundRunner(app.engine, { onEvent: (ev) => app.hud.event(ev) });
+  app.runner = new RoundRunner(app.engine, { onEvent: (ev) => {
+    app.hud.event(ev);
+    // Save each answer as it happens, so a reload mid-round loses nothing.
+    const pr = app.inRound && app.profile?.pendingRound;
+    if (pr && recordEvent(pr, ev, performance.now() - (app.roundT0 || 0))) app.save();
+  } });
   app.engine.on('charge_cleared', () => { app.input.reset(); app.audio.setHum(false); app.hud.charge(null); });
 
   // WebGL context loss: hold the round on the pause screen; if the engine cannot

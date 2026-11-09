@@ -187,6 +187,8 @@ input, textarea { font: inherit; -webkit-user-select: text; user-select: text; }
 .sparks-for { font-size: 18px; font-weight: 800; color: var(--ink); background: rgba(255, 255, 255, 0.7); border-radius: 14px; padding: 4px 10px; }
 .chest-meter { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 900; width: min(360px, 100%); }
 .chest-meter .bar { flex: 1; height: 14px; }
+.chest-meter { flex-wrap: wrap; justify-content: center; }
+.chest-welcome { flex-basis: 100%; text-align: center; font-size: 17px; color: var(--purple); }
 .rcard { position: relative; padding-top: 30px !important; }
 .rcard-ribbon { position: absolute; top: 0; left: 0; right: 0; border-radius: 24px 24px 0 0; background: var(--purple); color: #fff; font-size: 13px; font-weight: 900; letter-spacing: 0.06em; text-align: center; padding: 5px 6px; }
 .chest-wrap .rcard-ribbon { position: static; border-radius: 12px; padding: 4px 12px; }

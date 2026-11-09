@@ -178,7 +178,8 @@ test('normalize: unknown or prototype keys are dropped and strings capped', () =
   assert.equal(q.progress.lastEvent, null);
   assert.ok(q.id.length <= 40);
   assert.ok(q.rewards.real[0].id.length <= 40 && q.rewards.real[0].createdAt.length <= 40);
-  assert.deepEqual(Object.keys(q.pendingRound), ['seed', 'roundIndex', 'startedAt']);
+  assert.deepEqual(Object.keys(q.pendingRound), ['seed', 'roundIndex', 'startedAt', 'today', 'choice', 'offset', 'results', 'score', 'bestCombo', 'fixed', 'ms']);
+  assert.ok(!('junk' in q.pendingRound));
   assert.equal({}.met, undefined, 'Object.prototype not polluted');
 });
 

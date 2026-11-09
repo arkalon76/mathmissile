@@ -17,6 +17,10 @@ export const TUNING = Object.freeze({
   // accuracy kindness valve: after accuracyValveRounds rounds open, >= accuracyValveBox3 suffice.
   knownSpeedFactor: 1.5,
   kindnessValveRounds: 8,
+  welcomeBackStars: 1, // first round of a new day: +1 star on the chest meter
+  resumeMinAnswers: 3, // a reloaded round is applied once it has this many answers
+  resumeMaxResults: 200,
+  valveMinSums: 3, // a round counts toward a table's valves only with at least this many of its sums
   knownMinBox3: 10,
   knownFloorBox: 2,
   accuracyValveRounds: 8,
@@ -154,8 +158,8 @@ export const TUNING = Object.freeze({
 
   // §5.6 chests.
   starsPerChest: 6,
-  chestSparks: { star: [10, 20], hello: [10, 10], level: [20, 30], boss: [20, 30], crown: [20, 30] },
-  chestItems: { star: 1, hello: 0, level: 2, boss: 2, crown: 2 },
+  chestSparks: { star: [10, 20], level: [20, 30], boss: [20, 30], crown: [20, 30] },
+  chestItems: { star: 1, level: 2, boss: 2, crown: 2 },
   chestEmptyFallbackSparks: 30,
 
   // §5.7 badges.

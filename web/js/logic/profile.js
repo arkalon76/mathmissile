@@ -250,8 +250,34 @@ function normalizeProfile(raw, schema) {
     })),
   };
   const pr = raw.pendingRound && typeof raw.pendingRound === 'object' && !Array.isArray(raw.pendingRound) ? raw.pendingRound : null;
-  p.pendingRound = pr ? { seed: int(pr.seed, 0, 0, 2 ** 32), roundIndex: int(pr.roundIndex, 0, 0, 1e9), startedAt: sstr(pr.startedAt, '', 40) } : null;
+  p.pendingRound = pr ? cleanPending(pr) : null;
   return p;
+}
+
+/** A round saved mid-play (logic/resume.js): only known fields, bounded sizes. */
+function cleanPending(pr) {
+  const ch = pr.choice && typeof pr.choice === 'object' && !Array.isArray(pr.choice) ? pr.choice : {};
+  const choice = {};
+  if (ch.table != null) choice.table = int(ch.table, 1, 1, 12);
+  if (ch.boss != null) choice.boss = int(ch.boss, 1, 1, 12);
+  if (ch.revision === true) choice.revision = true;
+  const RES = ['correct', 'wrong', 'escaped'];
+  const results = arr(pr.results).filter((r) => r && typeof r === 'object' && RES.includes(r.result)
+    && r.fact && typeof r.fact === 'object').slice(0, TUNING.resumeMaxResults).map((r) => ({
+    result: r.result, graded: bool(r.graded, true),
+    fact: { a: int(r.fact.a, 1, 1, 12), b: int(r.fact.b, 1, 1, 12) },
+    slot: r.slot == null ? null : int(r.slot, 0, 0, 999), kind: sstr(r.kind, 'focus', 16),
+    special: sstr(r.special, null, 16), species: sstr(r.species, null, 32),
+    shiny: bool(r.shiny, false), ghost: bool(r.ghost, false), mini: bool(r.mini, false), golden: bool(r.golden, false),
+    rt_ms: r.rt_ms == null ? null : int(r.rt_ms, 0, 0, 600000), fast: bool(r.fast, false),
+    given: r.given == null ? null : int(r.given, 0, -1, 99999),
+  }));
+  return {
+    seed: int(pr.seed, 0, 0, 2 ** 32), roundIndex: int(pr.roundIndex, 0, 0, 1e9), startedAt: sstr(pr.startedAt, '', 40),
+    today: sstr(pr.today, null, 10), choice, offset: Number.isFinite(pr.offset) ? num(pr.offset, 0, -10, 10) : null,
+    results, score: int(pr.score, 0, 0, 1e7), bestCombo: int(pr.bestCombo, 0, 0, 1e4), fixed: int(pr.fixed, 0, 0, 1e4),
+    ms: int(pr.ms, 0, 0, 36e5),
+  };
 }
 
 // ---- store -----------------------------------------------------------------

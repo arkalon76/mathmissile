@@ -41,7 +41,8 @@ export function showReward(app, { report: R, plan }) {
   const sparksFor = h('div', { class: 'sparks-for' }, '→ 🛠️ Workshop');
   const chestNow = Math.min(p.progress.chestStars, TUNING.starsPerChest);
   const meter = h('div', { class: 'chest-meter', 'aria-label': `${chestNow} of ${TUNING.starsPerChest} stars to the next chest` },
-    h('span', null, `⭐ ${chestNow}/${TUNING.starsPerChest}`), bar(chestNow / TUNING.starsPerChest), h('span', null, '🎁'));
+    h('span', null, `⭐ ${chestNow}/${TUNING.starsPerChest}`), bar(chestNow / TUNING.starsPerChest), h('span', null, '🎁'),
+    R.welcomeStars ? h('span', { class: 'chest-welcome' }, `👋 +${R.welcomeStars} ⭐ welcome back!`) : null);
   const cards = h('div', { class: 'cards' });
   const guide = h('div', { class: 'practice-next', hidden: true });
   const next = h('div', { class: 'next-up', hidden: true });
@@ -96,6 +97,7 @@ export function showReward(app, { report: R, plan }) {
       await countUp(n, R.sparksBefore, R.sparksAfter, 600 / speed, throttle(() => app.audio.play('sfx_coin_tinkle', { volume: 0.3 }), 110));
       burst(sparks, { n: 12, chars: ['✨'] });
     }
+    if (R.welcomeStars) { app.audio.voice('vo_welcome_back'); await wait(400); }
 
     for (const c of R.cards) {
       const el = card(c);
